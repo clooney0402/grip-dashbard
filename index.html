@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>서비스기획2팀 과제현황</title>
+  <title>프로덕트 과제현황</title>
   <!-- React + Babel (빌드 없이 바로 실행) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -234,7 +234,7 @@ function Dashboard() {
       {/* 헤더 */}
       <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:20,flexWrap:"wrap",gap:12}}>
         <div>
-          <h1 style={{fontSize:21,fontWeight:700,color:"#0f172a",margin:0}}>서비스기획2팀 과제현황</h1>
+          <h1 style={{fontSize:21,fontWeight:700,color:"#0f172a",margin:0}}>프로덕트 과제현황</h1>
           <p style={{fontSize:12,color:"#64748b",margin:"4px 0 0"}}>
             {updatedAt ? `최종 업데이트: ${fmtDate(updatedAt)}` : ""} &nbsp;|&nbsp; 총 과제: <strong>{total}건</strong>
           </p>
@@ -313,8 +313,10 @@ function Dashboard() {
                   <span>{s.dot}</span>
                   <span style={{fontSize:12,fontWeight:700,color:s.color}}>{s.label}</span>
                 </div>
-                <div style={{fontSize:28,fontWeight:800,color:s.color,lineHeight:1.1}}>{bookingCounts[s.key]||0}</div>
-                <div style={{fontSize:10,color:"#64748b",marginTop:2}}>건</div>
+                <div style={{display:"flex",alignItems:"baseline",gap:3,marginTop:2}}>
+                  <span style={{fontSize:28,fontWeight:800,color:s.color,lineHeight:1.1}}>{bookingCounts[s.key]||0}</span>
+                  <span style={{fontSize:12,color:"#64748b",fontWeight:500}}>건</span>
+                </div>
                 <div style={{fontSize:10,color:"#94a3b8",marginTop:5,lineHeight:1.4}}>{s.sub}</div>
               </div>
             );
@@ -452,7 +454,7 @@ function Dashboard() {
       </div>
 
       <p style={{textAlign:"center",fontSize:11,color:"#cbd5e1",marginTop:20}}>
-        데이터 출처: 서비스기획2팀 과제현황 Google Sheets &nbsp;|&nbsp; 커머스프로덕트 기획팀
+        데이터 출처: 프로덕트 과제현황 Google Sheets &nbsp;|&nbsp; 커머스프로덕트 기획팀
       </p>
     </div>
   );
