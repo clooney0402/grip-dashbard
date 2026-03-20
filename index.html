@@ -412,10 +412,13 @@ function Dashboard() {
         <div>
           <div style={card}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-              <h2 style={{fontSize:13,fontWeight:700,color:"#0f172a",margin:0}}>👤 PM별 리소스 현황</h2>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <h2 style={{fontSize:13,fontWeight:700,color:"#0f172a",margin:0}}>👤 PM별 리소스 현황</h2>
+                <span style={{fontSize:10,color:"#94a3b8"}}>부킹대기 = 신규검토 + 검토중</span>
+              </div>
               {activePm && <button onClick={()=>setActivePm(null)} style={{fontSize:10,color:"#64748b",background:"#f1f5f9",border:"none",borderRadius:5,padding:"3px 8px",cursor:"pointer"}}>✕</button>}
             </div>
-            {topN(pmMap).map(([pm,cnt],idx)=>{
+            {topN(pmMap, 20).map(([pm,cnt],idx)=>{
               const pct = Math.round(cnt/total*100);
               const color = PM_COLORS[idx%PM_COLORS.length];
               const active = activePm===pm;
