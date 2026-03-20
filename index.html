@@ -178,7 +178,7 @@ function Dashboard() {
 
   const statusMap   = countBy(tasks, "status");
   const priorityMap = countBy(tasks, "priority");
-  const pmMap       = countBy(tasks, "pm");
+  const pmMap       = countBy(tasks.filter(t=>!["릴리스","보류"].includes(t.status)), "pm");
   const bookingCounts = BOOKING_STAGES.reduce((acc,s)=>{ acc[s.key]=tasks.filter(t=>t.booking===s.key).length; return acc; },{});
 
   const toggle = (val, setter, cur) => setter(cur===val ? null : val);
@@ -446,9 +446,9 @@ function Dashboard() {
           {activePm && (
             <div style={{...card,marginTop:10}}>
               <p style={{fontSize:12,fontWeight:600,color:"#374151",margin:"0 0 10px"}}>
-                {activePm} 담당 — {tasks.filter(t=>t.pm===activePm).length}건
+                {activePm} 담당 — {tasks.filter(t=>t.pm===activePm&&!["릴리스","보류"].includes(t.status)).length}건
               </p>
-              <TaskTable tasks={tasks.filter(t=>t.pm===activePm)}
+              <TaskTable tasks={tasks.filter(t=>t.pm===activePm&&!["릴리스","보류"].includes(t.status))}
                 color={PM_COLORS[topN(pmMap).findIndex(([p])=>p===activePm)%PM_COLORS.length]}/>
             </div>
           )}
