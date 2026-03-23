@@ -75,9 +75,13 @@ function TaskTable({ tasks, color }) {
   const iconStyle = (col) => ({ fontSize:10, color: sortCol===col ? "#6366f1" : "#94a3b8", marginLeft:2 });
 
   const sorted = sortCol === null ? tasks : [...tasks].sort((a,b) => {
-    if (sortCol === "pm") {
-      const cmp = (a.pm||"").localeCompare(b.pm||"", "ko");
+    if (sortCol === "pm" || sortCol === "domain") {
+      const cmp = (a[sortCol==="pm"?"pm":"domain"]||"").localeCompare(b[sortCol==="pm"?"pm":"domain"]||"", "ko");
       return sortAsc ? cmp : -cmp;
+    }
+    if (sortCol === "target") {
+      const av = (a.target||"zzz"); const bv = (b.target||"zzz");
+      return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
     }
     const ORDER = sortCol === "status" ? STATUS_ORDER : PRIORITY_ORDER;
     const av = ORDER.indexOf(a[sortCol === "status" ? "status" : "priority"]);
@@ -91,9 +95,10 @@ function TaskTable({ tasks, color }) {
       <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
         <thead>
           <tr style={{background:"rgba(0,0,0,0.04)"}}>
-            {["도메인","과제명"].map(h=>(
-              <th key={h} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0"}}>{h}</th>
-            ))}
+            <th onClick={()=>handleSort("domain")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
+              도메인 <span style={iconStyle("domain")}>{icon("domain")}</span>
+            </th>
+            <th style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0"}}>과제명</th>
             <th onClick={()=>handleSort("priority")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
               우선순위 <span style={iconStyle("priority")}>{icon("priority")}</span>
             </th>
@@ -103,9 +108,10 @@ function TaskTable({ tasks, color }) {
             <th onClick={()=>handleSort("status")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
               상태 <span style={iconStyle("status")}>{icon("status")}</span>
             </th>
-            {["목표","Jira"].map(h=>(
-              <th key={h} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0"}}>{h}</th>
-            ))}
+            <th onClick={()=>handleSort("target")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
+              목표 <span style={iconStyle("target")}>{icon("target")}</span>
+            </th>
+            <th style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0"}}>Jira</th>
           </tr>
         </thead>
         <tbody>
