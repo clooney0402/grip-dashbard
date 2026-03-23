@@ -38,10 +38,10 @@ const STATUS_COLOR   = { 릴리스:"#6366f1", 개발중:"#3b82f6", QA:"#8b5cf6",
 const PM_COLORS = ["#6366f1","#3b82f6","#8b5cf6","#ec4899","#f59e0b","#10b981","#14b8a6"];
 
 const BOOKING_STAGES = [
-  { key:"신규인입", label:"신규인입",  sub:"기획 검토 단계",            color:"#ef4444", bg:"#fef2f2", border:"#fecaca", dot:"🔴" },
-  { key:"신규검토", label:"신규검토",  sub:"개발/디자인 부킹 검토 대상", color:"#f97316", bg:"#fff7ed", border:"#fed7aa", dot:"🟠" },
-  { key:"검토중",   label:"검토중",    sub:"리소스 확인 중",              color:"#3b82f6", bg:"#eff6ff", border:"#bfdbfe", dot:"🔵" },
-  { key:"검토완료", label:"검토완료",  sub:"개발 부킹 확정",              color:"#22c55e", bg:"#f0fdf4", border:"#bbf7d0", dot:"🟢" },
+  { key:"검토전",   label:"검토전",   sub:"기획 검토 단계",            color:"#ef4444", bg:"#fef2f2", border:"#fecaca", dot:"🔴" },
+  { key:"검토필요", label:"검토필요", sub:"개발/디자인 부킹 검토 대상", color:"#f97316", bg:"#fff7ed", border:"#fed7aa", dot:"🟠" },
+  { key:"검토중",   label:"검토중",   sub:"리소스 확인 중",              color:"#3b82f6", bg:"#eff6ff", border:"#bfdbfe", dot:"🔵" },
+  { key:"검토완료", label:"검토완료", sub:"개발 부킹 확정",              color:"#22c55e", bg:"#f0fdf4", border:"#bbf7d0", dot:"🟢" },
 ];
 
 // ── 집계 헬퍼 ─────────────────────────────────────────────────────────────────
@@ -428,7 +428,7 @@ function Dashboard() {
               const pct = Math.round(cnt/total*100);
               const color = PM_COLORS[idx%PM_COLORS.length];
               const active = activePm===pm;
-              const pending = tasks.filter(t=>t.pm===pm && ["신규검토","검토대기","검토중"].includes(t.booking)).length;
+              const pending = tasks.filter(t=>t.pm===pm && ["검토전","검토필요","검토중"].includes(t.booking)).length;
               return (
                 <div key={pm} onClick={()=>toggle(pm,setActivePm,activePm)}
                   style={{marginBottom:10,cursor:"pointer",padding:"4px 6px",borderRadius:6,background:active?"#f1f5f9":"transparent"}}>
