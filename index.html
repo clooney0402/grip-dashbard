@@ -57,7 +57,7 @@ const STATUS_ORDER   = ["개발중","QA","PRD 작성","상세기획완료","상�
 const PRIORITY_ORDER = ["필수","상","중","하","백로그"];
 
 // ── 공통 태스크 테이블 ────────────────────────────────────────────────────────
-function TaskTable({ tasks, color }) {
+function TaskTable({ tasks, color, showDeploy }) {
   const [sortCol, setSortCol] = React.useState(null);
   const [sortAsc, setSortAsc] = React.useState(true);
 
@@ -79,8 +79,8 @@ function TaskTable({ tasks, color }) {
       const cmp = (a[sortCol==="pm"?"pm":"domain"]||"").localeCompare(b[sortCol==="pm"?"pm":"domain"]||"", "ko");
       return sortAsc ? cmp : -cmp;
     }
-    if (sortCol === "target") {
-      const av = (a.target||"zzz"); const bv = (b.target||"zzz");
+    if (sortCol === "target" || sortCol === "deploy") {
+      const av = (a[sortCol]||"zzz"); const bv = (b[sortCol]||"zzz");
       return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
     }
     const ORDER = sortCol === "status" ? STATUS_ORDER : PRIORITY_ORDER;
@@ -108,9 +108,12 @@ function TaskTable({ tasks, color }) {
             <th onClick={()=>handleSort("status")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
               상태 <span style={iconStyle("status")}>{icon("status")}</span>
             </th>
-            <th onClick={()=>handleSort("target")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
+            {!showDeploy && <th onClick={()=>handleSort("target")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
               목표 <span style={iconStyle("target")}>{icon("target")}</span>
-            </th>
+            </th>}
+            {showDeploy && <th onClick={()=>handleSort("deploy")} style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0",cursor:"pointer",userSelect:"none"}}>
+              배포일자 <span style={iconStyle("deploy")}>{icon("deploy")}</span>
+            </th>}
             <th style={{padding:"7px 10px",textAlign:"left",color:"#475569",fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid #e2e8f0"}}>Jira</th>
           </tr>
         </thead>
@@ -127,7 +130,7 @@ function TaskTable({ tasks, color }) {
               <td style={{padding:"6px 10px",whiteSpace:"nowrap"}}>
                 <span style={{background:(STATUS_COLOR[t.status]||"#94a3b8")+"22",color:STATUS_COLOR[t.status]||"#475569",padding:"2px 7px",borderRadius:4,fontSize:11}}>{t.status}</span>
               </td>
-              <td style={{padding:"6px 10px",whiteSpace:"nowrap",fontSize:11,color:"#64748b"}}>{t.target}</td>
+              <td style={{padding:"6px 10px",whiteSpace:"nowrap",fontSize:11,color:"#64748b"}}>{showDeploy ? (t.deploy||"—") : (t.target||"—")}</td>
               <td style={{padding:"6px 10px",whiteSpace:"nowrap"}}>
                 {t.jira
                   ? <a href={t.jira} target="_blank" rel="noopener noreferrer"
@@ -189,7 +192,10 @@ function Dashboard() {
   const statusMap   = countBy(tasks, "status");
   const priorityMap = countBy(tasks, "priority");
   const pmMap       = countBy(tasks.filter(t=>!["릴리스","보류"].includes(t.status)), "pm");
-  const bookingCounts = BOOKING_STAGES.reduce((acc,s)=>{ acc[s.key]=tasks.filter(t=>t.booking===s.key).length; return acc; },{});
+  const bookingCounts = BOOKING_STAGES.reduce((acc,s)=>{
+    acc[s.key] = tasks.filter(t=>t.booking===s.key && !(s.key==="검토완료" && t.status==="릴리스")).length;
+    return acc;
+  },{});
 
   const toggle = (val, setter, cur) => setter(cur===val ? null : val);
   const card = {background:"#fff",border:"1px solid #e2e8f0",borderRadius:12,padding:"18px 20px"};
@@ -366,7 +372,7 @@ function Dashboard() {
             </div>
             {activeReleased && (
               <div style={{marginTop:14,borderTop:"1px solid #e2e8f0",paddingTop:14}}>
-                <TaskTable tasks={releasedTasks} color="#6366f1"/>
+                <TaskTable tasks={releasedTasks} color="#6366f1" showDeploy={true}/>
               </div>
             )}
           </div>
