@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Specwise — Investor Pitch Deck</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              900: '#0a1733',
+              800: '#11214d',
+              700: '#1a2e6b',
+              600: '#2a3f80',
+            },
+            accent: {
+              500: '#ff6b3d',
+              400: '#ff8a63',
+              300: '#ffaa8a',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    .slide {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .slide.active { display: flex; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-container {
+      min-height: 100vh;
+    }
+    .progress-bar {
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body class="font-sans bg-navy-900 text-white">
+  <!-- Top progress -->
+  <div class="fixed top-0 left-0 right-0 h-1 bg-white/10 z-50">
+    <div id="progress" class="h-full bg-accent-500 progress-bar" style="width: 6.66%"></div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-navy-800/90 backdrop-blur px-4 py-3 rounded-full border border-white/10">
+    <button id="prevBtn" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center disabled:opacity-30">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="text-sm font-mono">
+      <span id="curSlide">1</span> / <span id="totalSlides">15</span>
+    </div>
+    <button id="nextBtn" class="w-10 h-10 rounded-full bg-accent-500 hover:bg-accent-400 flex items-center justify-center">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <a href="index.html" class="ml-2 text-sm text-gray-300 hover:text-white">홈</a>
+  </div>
+
+  <!-- Slide 1: Cover -->
+  <section class="slide active slide-container items-center justify-center px-8 md:px-16">
+    <div class="max-w-5xl w-full">
+      <div class="flex items-center gap-3 mb-12">
+        <div class="w-12 h-12 rounded-lg bg-accent-500 flex items-center justify-center font-bold text-2xl">S</div>
+        <span class="text-3xl font-bold">Specwise</span>
+      </div>
+      <h1 class="text-6xl md:text-7xl font-bold leading-tight mb-8">
+        퍼널부터 그리세요.<br />
+        <span class="text-accent-500">PRD는 우리가 씁니다.</span>
+      </h1>
+      <p class="text-2xl text-gray-300 mb-12 max-w-3xl">
+        한국 PM의 사고방식을 그대로 제품화한 AI 코파일럿
+      </p>
+      <div class="grid grid-cols-3 gap-6 max-w-2xl">
+        <div>
+          <div class="text-sm text-gray-400 mb-1">투자 단계</div>
+          <div class="text-xl font-bold">Pre-Seed</div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-400 mb-1">투자 유치</div>
+          <div class="text-xl font-bold">3~5억원</div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-400 mb-1">2026.05</div>
+          <div class="text-xl font-bold">Series Seed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: Problem -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">PROBLEM</div>
+      <h2 class="text-5xl font-bold mb-12">PM은 매주 18시간을 문서에 쓴다</h2>
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div class="space-y-4">
+          <div class="flex items-start gap-4 p-4 rounded-xl bg-navy-800">
+            <div class="text-3xl">📄</div>
+            <div>
+              <div class="font-bold mb-1">요건정의서</div>
+              <div class="text-gray-400 text-sm">평균 4~8시간 / 매번 처음부터</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 p-4 rounded-xl bg-navy-800">
+            <div class="text-3xl">🗂️</div>
+            <div>
+              <div class="font-bold mb-1">화면 흐름도</div>
+              <div class="text-gray-400 text-sm">2~3시간 / 도구 왕복 비효율</div>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="flex items-start gap-4 p-4 rounded-xl bg-navy-800">
+            <div class="text-3xl">⚙️</div>
+            <div>
+              <div class="font-bold mb-1">기능 명세</div>
+              <div class="text-gray-400 text-sm">3~5시간 / 빠진 요건 사후 발견</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 p-4 rounded-xl bg-navy-800">
+            <div class="text-3xl">📊</div>
+            <div>
+              <div class="font-bold mb-1">일정·공수 추정</div>
+              <div class="text-gray-400 text-sm">2시간 / 주관적 추정, 근거 부족</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 rounded-2xl bg-accent-500/10 border border-accent-500/30">
+        <div class="text-2xl font-bold mb-2">PM 업무 시간의 <span class="text-accent-500">30% 이상</span>이 반복적 문서 작업</div>
+        <div class="text-gray-300">기존 도구(ChatGPT, Notion AI, ChatPRD)는 <strong>텍스트 in → 텍스트 out</strong> 1차원. PM의 비주얼 사고방식과 안 맞음.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Solution -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">SOLUTION</div>
+      <h2 class="text-5xl font-bold mb-4">Funnel-First PRD Builder</h2>
+      <p class="text-xl text-gray-300 mb-12">PM의 사고 흐름을 그대로 제품화. 비주얼 → 데이터 → AI PRD.</p>
+
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="p-6 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="w-10 h-10 rounded-lg bg-accent-500 flex items-center justify-center font-bold mb-4">1</div>
+          <div class="font-bold mb-2">Funnel 그리기</div>
+          <div class="text-sm text-gray-400">Screen / Action / Decision / Exit 4종 노드로 사용자 여정 시각화</div>
+          <div class="mt-4 text-xs text-accent-500">✓ 자체 개발 완료</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="w-10 h-10 rounded-lg bg-accent-500 flex items-center justify-center font-bold mb-4">2</div>
+          <div class="font-bold mb-2">AI 클래리파잉</div>
+          <div class="text-sm text-gray-400">25년차 PM 페르소나가 누락 요건을 역질문</div>
+          <div class="mt-4 text-xs text-accent-500">⭐ 핵심 IP</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="w-10 h-10 rounded-lg bg-accent-500 flex items-center justify-center font-bold mb-4">3</div>
+          <div class="font-bold mb-2">PRD 자동 생성</div>
+          <div class="text-sm text-gray-400">퍼널 노드 → PRD 섹션 자동 매핑. 인라인 편집.</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="w-10 h-10 rounded-lg bg-accent-500 flex items-center justify-center font-bold mb-4">4</div>
+          <div class="font-bold mb-2">다음 단계 가이드</div>
+          <div class="text-sm text-gray-400">화면 목록·공수 추정·Figma/Excalidraw 연동</div>
+        </div>
+      </div>
+
+      <div class="mt-12 p-6 rounded-2xl bg-gradient-to-r from-accent-500/20 to-transparent border border-accent-500/30">
+        <div class="text-lg font-bold mb-1">⚡ 5분 안에 PRD 초안 + 화면 12개 식별 + 공수 추정 완료</div>
+        <div class="text-gray-300">기존 4시간 → 5분. <strong class="text-accent-500">시간 절감 96%</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Why Visual-First -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">DIFFERENTIATION</div>
+      <h2 class="text-5xl font-bold mb-12">PM은 글이 아니라 그림으로 생각한다</h2>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="p-8 rounded-2xl bg-navy-800 border border-white/10 opacity-70">
+          <div class="text-sm text-red-400 font-semibold mb-4">기존 방식 (ChatPRD, Notion AI)</div>
+          <div class="font-mono text-sm text-gray-400 leading-relaxed mb-6">
+            텍스트 입력<br />
+            ↓<br />
+            AI 생성<br />
+            ↓<br />
+            PRD 출력
+          </div>
+          <div class="text-gray-400">
+            ❌ 빈 페이지에서 시작<br />
+            ❌ 컨텍스트 부족<br />
+            ❌ PM 사고방식 불일치
+          </div>
+        </div>
+        <div class="p-8 rounded-2xl bg-gradient-to-br from-accent-500/20 to-accent-500/5 border-2 border-accent-500">
+          <div class="text-sm text-accent-500 font-semibold mb-4">Specwise 방식</div>
+          <div class="font-mono text-sm text-white leading-relaxed mb-6">
+            <span class="text-accent-500">비주얼 사고 (퍼널)</span><br />
+            ↓<br />
+            <span class="text-accent-500">구조화 데이터</span><br />
+            ↓<br />
+            <span class="text-accent-500">컨텍스트 인식 AI</span><br />
+            ↓<br />
+            PRD + 다음 단계
+          </div>
+          <div>
+            ✅ 노드 = PRD 섹션 자동 매핑<br />
+            ✅ 25년 PM 도메인 컨텍스트<br />
+            ✅ 한국 SI 양식 특화
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Mapping Table -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">CORE INSIGHT</div>
+      <h2 class="text-5xl font-bold mb-4">25년 PM의 사고가 데이터 모델이 된다</h2>
+      <p class="text-xl text-gray-300 mb-12">Funnel 노드 = PRD 섹션. 우연이 아니다.</p>
+
+      <div class="grid md:grid-cols-2 gap-3">
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-navy-800">
+          <div class="w-12 h-12 rounded-lg bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center font-bold text-blue-400 text-xs">SC</div>
+          <div class="flex-1">
+            <div class="font-bold">Screen 노드</div>
+            <div class="text-sm text-gray-400">→ 화면 목록 / 화면별 요건</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-navy-800">
+          <div class="w-12 h-12 rounded-lg bg-green-500/20 border-2 border-green-400 flex items-center justify-center font-bold text-green-400 text-xs">AC</div>
+          <div class="flex-1">
+            <div class="font-bold">Action 노드</div>
+            <div class="text-sm text-gray-400">→ 사용자 시나리오 / 기능 요건</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-navy-800">
+          <div class="w-12 h-12 rounded-lg bg-yellow-500/20 border-2 border-yellow-400 flex items-center justify-center font-bold text-yellow-400 text-xs">DE</div>
+          <div class="flex-1">
+            <div class="font-bold">Decision 노드</div>
+            <div class="text-sm text-gray-400">→ 비즈니스 룰 / 분기 로직</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-navy-800">
+          <div class="w-12 h-12 rounded-lg bg-purple-500/20 border-2 border-purple-400 flex items-center justify-center font-bold text-purple-400 text-xs">EX</div>
+          <div class="flex-1">
+            <div class="font-bold">Exit 노드</div>
+            <div class="text-sm text-gray-400">→ 완료 시나리오 / 성공 지표</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 p-6 rounded-2xl bg-navy-800 border border-accent-500/30">
+        <div class="text-lg italic text-gray-300">"25년 PM 경험이 무의식적으로 만든 사고 구조가 그대로 데이터 모델이 됨. <span class="text-accent-500 not-italic font-bold">이게 진짜 IP.</span>"</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 6: Market -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">MARKET</div>
+      <h2 class="text-5xl font-bold mb-12">한국 SI/PM 시장</h2>
+
+      <div class="grid md:grid-cols-3 gap-6 mb-12">
+        <div class="p-8 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="text-sm text-gray-400 mb-2">TAM</div>
+          <div class="text-5xl font-bold text-accent-500 mb-2">28조원</div>
+          <div class="text-sm text-gray-300">국내 SI 시장 전체<br />(KOSA 2024)</div>
+        </div>
+        <div class="p-8 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="text-sm text-gray-400 mb-2">SAM</div>
+          <div class="text-5xl font-bold text-accent-500 mb-2">4.2조원</div>
+          <div class="text-sm text-gray-300">기획·설계 단계<br />(SI 공수의 15%)</div>
+        </div>
+        <div class="p-8 rounded-2xl bg-gradient-to-br from-accent-500/20 to-accent-500/5 border-2 border-accent-500">
+          <div class="text-sm text-accent-500 mb-2">SOM (3년)</div>
+          <div class="text-5xl font-bold text-accent-500 mb-2">420억원</div>
+          <div class="text-sm">디지털 PM 1만명<br />× 월 35만원 × 12개월</div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl bg-navy-800">
+          <div class="text-2xl font-bold mb-3">🇰🇷 한국만의 기회</div>
+          <div class="space-y-2 text-gray-300">
+            <div>• 국가표준 산출물 양식 (NIPA, 공공 ISMP/ISP)</div>
+            <div>• 하청 구조의 양식 변환 페인</div>
+            <div>• 회의록 문화 → AI 활용 적합</div>
+          </div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800">
+          <div class="text-2xl font-bold mb-3">📈 성장 동력</div>
+          <div class="space-y-2 text-gray-300">
+            <div>• AI 도구 일반화 (PM 거부감 ↓)</div>
+            <div>• SI 디지털 전환 가속</div>
+            <div>• 글로벌 경쟁자 부재 (한국어)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: Competition -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">COMPETITION</div>
+      <h2 class="text-5xl font-bold mb-12">경쟁 환경</h2>
+
+      <div class="overflow-hidden rounded-2xl border border-white/10">
+        <table class="w-full">
+          <thead class="bg-navy-800">
+            <tr class="text-left text-sm text-gray-300">
+              <th class="p-4 font-semibold">서비스</th>
+              <th class="p-4 font-semibold">입력 방식</th>
+              <th class="p-4 font-semibold">한국어 양식</th>
+              <th class="p-4 font-semibold">도메인 특화</th>
+              <th class="p-4 font-semibold">PM 워크플로우</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/10">
+            <tr class="bg-navy-900">
+              <td class="p-4 font-bold">ChatPRD</td>
+              <td class="p-4 text-gray-400">텍스트</td>
+              <td class="p-4">❌</td>
+              <td class="p-4 text-gray-400">일반 PM</td>
+              <td class="p-4 text-gray-400">PRD만</td>
+            </tr>
+            <tr class="bg-navy-900">
+              <td class="p-4 font-bold">Notion AI</td>
+              <td class="p-4 text-gray-400">텍스트</td>
+              <td class="p-4 text-yellow-400">⚠️ 부분</td>
+              <td class="p-4 text-gray-400">범용</td>
+              <td class="p-4 text-gray-400">일부</td>
+            </tr>
+            <tr class="bg-navy-900">
+              <td class="p-4 font-bold">Productboard AI</td>
+              <td class="p-4 text-gray-400">텍스트</td>
+              <td class="p-4">❌</td>
+              <td class="p-4 text-gray-400">B2B</td>
+              <td class="p-4 text-gray-400">일부</td>
+            </tr>
+            <tr class="bg-navy-900">
+              <td class="p-4 font-bold">Wrtn / Liner (KR)</td>
+              <td class="p-4 text-gray-400">텍스트</td>
+              <td class="p-4 text-green-400">✅</td>
+              <td class="p-4 text-gray-400">범용</td>
+              <td class="p-4 text-gray-400">없음</td>
+            </tr>
+            <tr class="bg-accent-500/10 border-t-2 border-accent-500">
+              <td class="p-4 font-bold text-accent-500">Specwise</td>
+              <td class="p-4 font-bold">비주얼 + 텍스트</td>
+              <td class="p-4 text-green-400">✅</td>
+              <td class="p-4 font-bold">한국 SI/PM</td>
+              <td class="p-4 font-bold">End-to-End</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-12 grid md:grid-cols-3 gap-4">
+        <div class="p-5 rounded-xl bg-navy-800">
+          <div class="text-3xl mb-2">🛡️</div>
+          <div class="font-bold mb-1">한국 SI 도메인 IP</div>
+          <div class="text-sm text-gray-400">25년 경험 기반 질문/안티패턴</div>
+        </div>
+        <div class="p-5 rounded-xl bg-navy-800">
+          <div class="text-3xl mb-2">🎯</div>
+          <div class="font-bold mb-1">Funnel-First 워크플로우</div>
+          <div class="text-sm text-gray-400">자체 개발 비주얼 도구 자산</div>
+        </div>
+        <div class="p-5 rounded-xl bg-navy-800">
+          <div class="text-3xl mb-2">🤝</div>
+          <div class="font-bold mb-1">PM 커뮤니티 락인</div>
+          <div class="text-sm text-gray-400">창업자 25년 네트워크</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 8: Business Model -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">BUSINESS MODEL</div>
+      <h2 class="text-5xl font-bold mb-12">3-Tier SaaS</h2>
+
+      <div class="grid md:grid-cols-3 gap-6 mb-12">
+        <div class="p-8 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="text-sm text-gray-400 mb-2">Starter</div>
+          <div class="text-4xl font-bold mb-1">₩9.9만</div>
+          <div class="text-sm text-gray-400 mb-6">/ 월</div>
+          <div class="text-sm text-gray-300 mb-6">프리랜서 PM</div>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li>✓ 프로젝트 1개</li>
+            <li>✓ 월 산출물 100건</li>
+            <li>✓ 한국어 양식 4종</li>
+          </ul>
+        </div>
+        <div class="p-8 rounded-2xl bg-gradient-to-br from-accent-500/20 to-accent-500/5 border-2 border-accent-500 transform scale-105">
+          <div class="text-sm text-accent-500 mb-2">Pro · 추천</div>
+          <div class="text-4xl font-bold mb-1">₩49만</div>
+          <div class="text-sm text-gray-400 mb-6">/ 월</div>
+          <div class="text-sm mb-6">에이전시 / 소형 SI</div>
+          <ul class="space-y-2 text-sm">
+            <li>✓ 프로젝트 5개</li>
+            <li>✓ 무제한 산출물</li>
+            <li>✓ 협업 5인</li>
+            <li>✓ 케이스 라이브러리</li>
+          </ul>
+        </div>
+        <div class="p-8 rounded-2xl bg-navy-800 border border-white/10">
+          <div class="text-sm text-gray-400 mb-2">Enterprise</div>
+          <div class="text-4xl font-bold mb-1">₩200만+</div>
+          <div class="text-sm text-gray-400 mb-6">/ 월</div>
+          <div class="text-sm text-gray-300 mb-6">중대형 SI</div>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li>✓ 커스텀 양식</li>
+            <li>✓ API 연동</li>
+            <li>✓ 전담 지원</li>
+            <li>✓ 온프레미스 옵션</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="p-5 rounded-xl bg-navy-800">
+          <div class="text-sm text-gray-400 mb-1">Gross Margin</div>
+          <div class="text-3xl font-bold text-accent-500">78%</div>
+        </div>
+        <div class="p-5 rounded-xl bg-navy-800">
+          <div class="text-sm text-gray-400 mb-1">LTV / CAC</div>
+          <div class="text-3xl font-bold text-accent-500">11.5x</div>
+        </div>
+        <div class="p-5 rounded-xl bg-navy-800">
+          <div class="text-sm text-gray-400 mb-1">Payback</div>
+          <div class="text-3xl font-bold text-accent-500">2.1개월</div>
+        </div>
+        <div class="p-5 rounded-xl bg-navy-800">
+          <div class="text-sm text-gray-400 mb-1">고객 ROI</div>
+          <div class="text-3xl font-bold text-accent-500">1,267%</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 9: GTM -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">GO-TO-MARKET</div>
+      <h2 class="text-5xl font-bold mb-12">3단계 진입 전략</h2>
+
+      <div class="space-y-4">
+        <div class="p-6 rounded-2xl bg-navy-800 border-l-4 border-accent-500">
+          <div class="flex items-start gap-6">
+            <div class="text-4xl font-bold text-accent-500">1</div>
+            <div class="flex-1">
+              <div class="text-sm text-accent-500 font-semibold mb-1">PHASE 1 · M1~M6</div>
+              <div class="text-2xl font-bold mb-2">프리랜서 시니어 PM</div>
+              <div class="text-gray-300 mb-3">디스콰이엇·링크드인·팟캐스트로 도달. 창업자 네트워크 활용.</div>
+              <div class="flex gap-6 text-sm">
+                <div><span class="text-gray-400">목표:</span> <strong>유료 50명</strong></div>
+                <div><span class="text-gray-400">MRR:</span> <strong>500만원</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-navy-800 border-l-4 border-accent-500/60">
+          <div class="flex items-start gap-6">
+            <div class="text-4xl font-bold text-accent-500/60">2</div>
+            <div class="flex-1">
+              <div class="text-sm text-accent-500 font-semibold mb-1">PHASE 2 · M7~M12</div>
+              <div class="text-2xl font-bold mb-2">소형 에이전시 + 중소 SI</div>
+              <div class="text-gray-300 mb-3">Phase 1 사용자 referral · 케이스 스터디 · CEO 직접 영업.</div>
+              <div class="flex gap-6 text-sm">
+                <div><span class="text-gray-400">목표:</span> <strong>30개사</strong></div>
+                <div><span class="text-gray-400">MRR:</span> <strong>3,000만원</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-navy-800 border-l-4 border-accent-500/30">
+          <div class="flex items-start gap-6">
+            <div class="text-4xl font-bold text-accent-500/30">3</div>
+            <div class="flex-1">
+              <div class="text-sm text-accent-500 font-semibold mb-1">PHASE 3 · Y2</div>
+              <div class="text-2xl font-bold mb-2">엔터프라이즈</div>
+              <div class="text-gray-300 mb-3">대형 SI · 공공 벤더. 정부 표준 양식 인증.</div>
+              <div class="flex gap-6 text-sm">
+                <div><span class="text-gray-400">목표:</span> <strong>3~5개 계약</strong></div>
+                <div><span class="text-gray-400">ARR:</span> <strong>1억+ /계정</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 10: Roadmap -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">ROADMAP</div>
+      <h2 class="text-5xl font-bold mb-12">제품 진화</h2>
+
+      <div class="space-y-3">
+        <div class="grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-2 text-right text-sm text-gray-400">M1~M2</div>
+          <div class="col-span-2 font-bold text-accent-500">POC v0.1</div>
+          <div class="col-span-8 p-4 rounded-xl bg-navy-800">Funnel + AI PRD + 다음 단계 (5.5주, 무료 베타)</div>
+        </div>
+        <div class="grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-2 text-right text-sm text-gray-400">M3~M6</div>
+          <div class="col-span-2 font-bold text-accent-500">v1.0</div>
+          <div class="col-span-8 p-4 rounded-xl bg-navy-800">결제 · 템플릿 · 협업 · 한국어 양식 4종</div>
+        </div>
+        <div class="grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-2 text-right text-sm text-gray-400">M7~M9</div>
+          <div class="col-span-2 font-bold text-accent-500">v1.5</div>
+          <div class="col-span-8 p-4 rounded-xl bg-navy-800">회의록 STT · 공공 SI 표준 양식 · 케이스 라이브러리</div>
+        </div>
+        <div class="grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-2 text-right text-sm text-gray-400">M10~M12</div>
+          <div class="col-span-2 font-bold text-accent-500">v2.0</div>
+          <div class="col-span-8 p-4 rounded-xl bg-navy-800">Wireframe 모듈 (Figma 플러그인) · 사용자 커스텀 빌더</div>
+        </div>
+        <div class="grid grid-cols-12 gap-4 items-center">
+          <div class="col-span-2 text-right text-sm text-gray-400">Y2</div>
+          <div class="col-span-2 font-bold text-accent-500">v3.0</div>
+          <div class="col-span-8 p-4 rounded-xl bg-navy-800">화면 자동 생성 · QA/매뉴얼 모듈 · API · 글로벌 영문</div>
+        </div>
+      </div>
+
+      <div class="mt-12 p-6 rounded-2xl bg-gradient-to-r from-accent-500/20 to-transparent border border-accent-500/30">
+        <div class="text-2xl font-bold mb-1">🎯 북극성: <span class="text-accent-500">한국 SI/PM 워크플로우의 OS</span></div>
+        <div class="text-gray-300">기획 → 설계 → 개발 → QA → 매뉴얼까지 전체 산출물 자동화 플랫폼</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 11: Financials -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">FINANCIALS</div>
+      <h2 class="text-5xl font-bold mb-12">12개월 매출 추이</h2>
+
+      <div class="overflow-hidden rounded-2xl border border-white/10 mb-8">
+        <table class="w-full">
+          <thead class="bg-navy-800">
+            <tr class="text-left text-sm text-gray-300">
+              <th class="p-4">분기</th>
+              <th class="p-4 text-right">Starter</th>
+              <th class="p-4 text-right">Pro</th>
+              <th class="p-4 text-right">Enterprise</th>
+              <th class="p-4 text-right">MRR (월말)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/10">
+            <tr class="bg-navy-900"><td class="p-4 font-bold">Q1</td><td class="p-4 text-right">5</td><td class="p-4 text-right">2</td><td class="p-4 text-right">0</td><td class="p-4 text-right text-gray-300">148만원</td></tr>
+            <tr class="bg-navy-900"><td class="p-4 font-bold">Q2</td><td class="p-4 text-right">15</td><td class="p-4 text-right">8</td><td class="p-4 text-right">1</td><td class="p-4 text-right text-gray-300">749만원</td></tr>
+            <tr class="bg-navy-900"><td class="p-4 font-bold">Q3</td><td class="p-4 text-right">30</td><td class="p-4 text-right">20</td><td class="p-4 text-right">3</td><td class="p-4 text-right text-gray-300">1,887만원</td></tr>
+            <tr class="bg-accent-500/10"><td class="p-4 font-bold text-accent-500">Q4</td><td class="p-4 text-right font-bold">50</td><td class="p-4 text-right font-bold">40</td><td class="p-4 text-right font-bold">6</td><td class="p-4 text-right font-bold text-accent-500">3,665만원</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-2xl bg-navy-800">
+          <div class="text-sm text-gray-400 mb-1">12M 누적 매출</div>
+          <div class="text-3xl font-bold">1.24억원</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800">
+          <div class="text-sm text-gray-400 mb-1">BEP 도달</div>
+          <div class="text-3xl font-bold">Q4 초</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800">
+          <div class="text-sm text-gray-400 mb-1">월 운영비 (Q4)</div>
+          <div class="text-3xl font-bold">3,100만원</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 12: Team -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">TEAM</div>
+      <h2 class="text-5xl font-bold mb-12">창업자</h2>
+
+      <div class="p-8 rounded-2xl bg-gradient-to-br from-accent-500/10 to-transparent border border-accent-500/30 mb-12">
+        <div class="flex items-start gap-6">
+          <div class="w-20 h-20 rounded-full bg-accent-500 flex items-center justify-center text-3xl font-bold">Y</div>
+          <div class="flex-1">
+            <div class="text-2xl font-bold mb-1">CEO / Chief Product Officer</div>
+            <div class="text-accent-500 mb-4">25년차 시니어 PM</div>
+            <div class="grid md:grid-cols-2 gap-4 text-gray-300">
+              <div>✓ 25년 PM 커리어 (기획·UI·IX·상품 방향)</div>
+              <div>✓ Funnel Builder 자체 개발 완료</div>
+              <div>✓ PM 도메인 IP 원천</div>
+              <div>✓ 시드 사용자 즉시 확보 가능 네트워크</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-2xl font-bold mb-6">6개월 내 영입</div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-6 rounded-2xl bg-navy-800 border border-dashed border-white/20">
+          <div class="text-sm text-gray-400 mb-2">공동창업자 영입 예정</div>
+          <div class="text-xl font-bold mb-2">CTO</div>
+          <div class="text-sm text-gray-300">제품 개발 책임, AI 파이프라인</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800 border border-dashed border-white/20">
+          <div class="text-sm text-gray-400 mb-2">자문 → 정규직</div>
+          <div class="text-xl font-bold mb-2">CBO</div>
+          <div class="text-sm text-gray-300">재무, BM, 투자유치</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-navy-800 border border-dashed border-white/20">
+          <div class="text-sm text-gray-400 mb-2">자문 → 정규직</div>
+          <div class="text-xl font-bold mb-2">CMO</div>
+          <div class="text-sm text-gray-300">콘텐츠, 커뮤니티, 브랜딩</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 13: Funding Ask -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="text-accent-500 font-semibold mb-4 tracking-wider">FUNDING ASK</div>
+      <h2 class="text-5xl font-bold mb-4">시드 라운드</h2>
+      <div class="text-7xl font-bold text-accent-500 mb-12">3~5억원</div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <div class="text-2xl font-bold mb-6">자금 사용 계획 (3억 기준)</div>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-4 rounded-xl bg-navy-800">
+              <div>인건비 (12개월)</div>
+              <div class="font-bold">1.8억 · 60%</div>
+            </div>
+            <div class="flex items-center justify-between p-4 rounded-xl bg-navy-800">
+              <div>개발 외주 + 인프라</div>
+              <div class="font-bold">0.45억 · 15%</div>
+            </div>
+            <div class="flex items-center justify-between p-4 rounded-xl bg-navy-800">
+              <div>마케팅</div>
+              <div class="font-bold">0.45억 · 15%</div>
+            </div>
+            <div class="flex items-center justify-between p-4 rounded-xl bg-navy-800">
+              <div>법무·세무·사무</div>
+              <div class="font-bold">0.15억 · 5%</div>
+            </div>
+            <div class="flex items-center justify-between p-4 rounded-xl bg-navy-800">
+              <div>예비비</div>
+              <div class="font-bold">0.15억 · 5%</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold mb-6">12개월 후 도달 목표</div>
+          <div class="space-y-3">
+            <div class="p-5 rounded-xl bg-gradient-to-r from-accent-500/20 to-transparent border border-accent-500/30">
+              <div class="text-sm text-accent-500 mb-1">MRR</div>
+              <div class="text-3xl font-bold">3,000만원+</div>
+            </div>
+            <div class="p-5 rounded-xl bg-navy-800">
+              <div class="text-sm text-gray-400 mb-1">유료 고객</div>
+              <div class="text-3xl font-bold">60개+</div>
+            </div>
+            <div class="p-5 rounded-xl bg-navy-800">
+              <div class="text-sm text-gray-400 mb-1">엔터프라이즈 계약</div>
+              <div class="text-3xl font-bold">3~6건</div>
+            </div>
+            <div class="p-5 rounded-xl bg-navy-800">
+              <div class="text-sm text-gray-400 mb-1">Series A 준비</div>
+              <div class="text-3xl font-bold">15~30억원</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 14: Why Now / Why Us -->
+  <section class="slide slide-container items-center px-8 md:px-16 py-20">
+    <div class="max-w-6xl w-full">
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <div class="text-accent-500 font-semibold mb-4 tracking-wider">WHY NOW</div>
+          <h2 class="text-4xl font-bold mb-8">왜 지금인가</h2>
+          <div class="space-y-4">
+            <div class="flex gap-4 p-4 rounded-xl bg-navy-800">
+              <div class="text-2xl">🤖</div>
+              <div>
+                <div class="font-bold mb-1">AI 도구 일반화</div>
+                <div class="text-sm text-gray-400">PM의 AI 거부감 ↓ (3년 전과 다름)</div>
+              </div>
+            </div>
+            <div class="flex gap-4 p-4 rounded-xl bg-navy-800">
+              <div class="text-2xl">🇰🇷</div>
+              <div>
+                <div class="font-bold mb-1">한국 SI 디지털 전환</div>
+                <div class="text-sm text-gray-400">산출물 표준화 압력 증가</div>
+              </div>
+            </div>
+            <div class="flex gap-4 p-4 rounded-xl bg-navy-800">
+              <div class="text-2xl">🧠</div>
+              <div>
+                <div class="font-bold mb-1">25년 경험의 자산화 가능</div>
+                <div class="text-sm text-gray-400">LLM 시대 이전엔 불가능했던 모델</div>
+              </div>
+            </div>
+            <div class="flex gap-4 p-4 rounded-xl bg-navy-800">
+              <div class="text-2xl">🎯</div>
+              <div>
+                <div class="font-bold mb-1">글로벌 경쟁자 부재</div>
+                <div class="text-sm text-gray-400">ChatPRD는 영문 한정</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-accent-500 font-semibold mb-4 tracking-wider">WHY US</div>
+          <h2 class="text-4xl font-bold mb-8">왜 우리인가</h2>
+          <div class="space-y-4">
+            <div class="flex gap-4 p-4 rounded-xl bg-gradient-to-r from-accent-500/20 to-transparent border border-accent-500/30">
+              <div class="text-2xl">📚</div>
+              <div>
+                <div class="font-bold mb-1">25년 PM 도메인 IP</div>
+                <div class="text-sm text-gray-300">데이터·질문·안티패턴 자산</div>
+              </div>
+            </div>
+            <div class="flex gap-4 p-4 rounded-xl bg-gradient-to-r from-accent-500/20 to-transparent border border-accent-500/30">
+              <div class="text-2xl">🛠️</div>
+              <div>
+                <div class="font-bold mb-1">자체 개발 Funnel Builder</div>
+                <div class="text-sm text-gray-300">비개발자가 작동 제품 빌드 증명</div>
+              </div>
+            </div>
+            <div class="flex gap-4 p-4 rounded-xl bg-gradient-to-r from-accent-500/20 to-transparent border border-accent-500/30">
+              <div class="text-2xl">👥</div>
+              <div>
+                <div class="font-bold mb-1">PM 네트워크</div>
+                <div class="text-sm text-gray-300">시드 사용자 즉시 확보</div>
+              </div>
+            </div>
+            <div class="flex gap-4 p-4 rounded-xl bg-gradient-to-r from-accent-500/20 to-transparent border border-accent-500/30">
+              <div class="text-2xl">🇰🇷</div>
+              <div>
+                <div class="font-bold mb-1">한국 SI 도메인 깊이</div>
+                <div class="text-sm text-gray-300">글로벌 경쟁사 못 따라옴</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 15: CTA -->
+  <section class="slide slide-container items-center justify-center px-8 md:px-16 py-20">
+    <div class="max-w-4xl w-full text-center">
+      <div class="flex items-center gap-3 mb-12 justify-center">
+        <div class="w-12 h-12 rounded-lg bg-accent-500 flex items-center justify-center font-bold text-2xl">S</div>
+        <span class="text-3xl font-bold">Specwise</span>
+      </div>
+      <h2 class="text-6xl md:text-7xl font-bold leading-tight mb-8">
+        함께 한국 PM의<br />
+        <span class="text-accent-500">생산성을 다시 정의</span>합시다
+      </h2>
+      <p class="text-2xl text-gray-300 mb-16">
+        25년의 PM 경험 + AI = 새로운 카테고리
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-6 mb-16">
+        <a href="prototype.html" class="p-6 rounded-2xl bg-accent-500 hover:bg-accent-400 transition">
+          <div class="font-bold text-lg mb-1">데모 시연</div>
+          <div class="text-sm">5단계 프로토타입</div>
+        </a>
+        <a href="https://clooney0402.github.io/commerce.product/funnel-builder.html" target="_blank" class="p-6 rounded-2xl bg-navy-800 hover:bg-navy-700 transition border border-white/10">
+          <div class="font-bold text-lg mb-1">Funnel Builder</div>
+          <div class="text-sm text-gray-400">자체 개발 도구</div>
+        </a>
+        <a href="mailto:clooney0402@gmail.com" class="p-6 rounded-2xl bg-navy-800 hover:bg-navy-700 transition border border-white/10">
+          <div class="font-bold text-lg mb-1">투자 미팅</div>
+          <div class="text-sm text-gray-400">contact@</div>
+        </a>
+      </div>
+
+      <div class="text-sm text-gray-400">
+        clooney0402@gmail.com · Specwise © 2026
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let cur = 0;
+    const progress = document.getElementById('progress');
+    const curSlideEl = document.getElementById('curSlide');
+    const totalSlidesEl = document.getElementById('totalSlides');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    totalSlidesEl.textContent = total;
+
+    function show(i) {
+      slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      cur = i;
+      curSlideEl.textContent = i + 1;
+      progress.style.width = ((i + 1) / total * 100) + '%';
+      prevBtn.disabled = i === 0;
+      window.scrollTo(0, 0);
+    }
+
+    function next() { if (cur < total - 1) show(cur + 1); }
+    function prev() { if (cur > 0) show(cur - 1); }
+
+    nextBtn.addEventListener('click', next);
+    prevBtn.addEventListener('click', prev);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    });
+
+    show(0);
+  </script>
+</body>
+</html>
