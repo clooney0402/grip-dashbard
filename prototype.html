@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Specwise — Product Demo</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] },
+          colors: {
+            navy: { 900: '#0a1733', 800: '#11214d', 700: '#1a2e6b', 600: '#2a3f80' },
+            accent: { 500: '#ff6b3d', 400: '#ff8a63', 300: '#ffaa8a' },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    .step { display: none; animation: fadeIn 0.4s ease; }
+    .step.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(255, 107, 61, 0.5); }
+      70% { box-shadow: 0 0 0 12px rgba(255, 107, 61, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 107, 61, 0); }
+    }
+    .pulse { animation: pulse-ring 2s infinite; }
+    .typing::after { content: '|'; animation: blink 1s infinite; }
+    @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+    .funnel-node { transition: all 0.3s ease; }
+    .funnel-node.highlight { transform: scale(1.1); box-shadow: 0 0 0 3px #ff6b3d; }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #e5e7eb; color: #9ca3af;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+    }
+    .step-dot.active { background: #ff6b3d; color: white; }
+    .step-dot.done { background: #ff6b3d; color: white; opacity: 0.6; cursor: pointer; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast { animation: slideUp 0.3s ease; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 1s linear infinite; }
+    @media print {
+      header, .no-print { display: none !important; }
+      .step { display: block !important; }
+    }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 min-h-screen">
+  <!-- Top Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center font-bold text-white">S</div>
+        <span class="font-bold text-navy-900">Specwise</span>
+        <span class="text-xs text-gray-400 ml-2">Demo v0.2</span>
+      </a>
+      <div class="flex items-center gap-2" id="stepIndicator">
+        <button class="step-dot active" data-step="1" onclick="goStep(1)">1</button>
+        <div class="w-6 h-px bg-gray-300"></div>
+        <button class="step-dot" data-step="2" onclick="goStep(2)">2</button>
+        <div class="w-6 h-px bg-gray-300"></div>
+        <button class="step-dot" data-step="3" onclick="goStep(3)">3</button>
+        <div class="w-6 h-px bg-gray-300"></div>
+        <button class="step-dot" data-step="4" onclick="goStep(4)">4</button>
+        <div class="w-6 h-px bg-gray-300"></div>
+        <button class="step-dot" data-step="5" onclick="goStep(5)">5</button>
+        <div class="w-6 h-px bg-gray-300"></div>
+        <button class="step-dot" data-step="6" onclick="goStep(6)">6</button>
+      </div>
+      <a href="index.html" class="text-sm text-gray-500 hover:text-gray-700">홈</a>
+    </div>
+  </header>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+
+  <!-- ==================== STEP 1: PROJECT INTAKE ==================== -->
+  <section class="step active" data-step="1">
+    <div class="max-w-4xl mx-auto px-6 py-12">
+      <div class="text-center mb-12">
+        <div class="inline-block px-3 py-1 rounded-full bg-accent-500/10 text-accent-500 text-sm font-semibold mb-4">STEP 1 · 프로젝트 시작</div>
+        <h1 class="text-4xl font-bold text-navy-900 mb-3">어떤 프로젝트를 시작하시나요?</h1>
+        <p class="text-gray-600">한 줄 설명 또는 회의록을 입력하면 PRD 자동 생성을 시작합니다</p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">프로젝트 설명</label>
+        <textarea id="projectDesc" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none" rows="4">1인 가구를 위한 신선식품 정기배송 서비스. 사용자가 가입 후 식단 취향을 설정하면 매주 AI가 식단을 추천하고, 자동 결제 후 새벽배송된다. 사용자는 식단을 변경하거나 일시정지 할 수 있어야 한다.</textarea>
+
+        <div class="mt-6 flex flex-wrap gap-3 items-center text-sm text-gray-500">
+          <button onclick="toast('회의록 업로드 (.docx, .txt 지원)', 'info')" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">📎 회의록 업로드</button>
+          <button onclick="toast('음성 녹음 시작 (Whisper STT)', 'info')" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">🎙️ 음성으로 입력</button>
+          <button onclick="toast('Notion 페이지 가져오기', 'info')" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">📋 Notion 연동</button>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4 mb-6">
+        <button onclick="selectSize('S')" class="size-card p-5 bg-white rounded-2xl border-2 border-gray-200 text-left hover:border-accent-500 transition" data-size="S">
+          <div class="size-tag text-xs font-semibold text-gray-500 mb-1">SIZE S</div>
+          <div class="size-title font-bold text-navy-900 mb-1">피처 추가</div>
+          <div class="size-desc text-sm text-gray-500">2~4주 / 화면 5장 미만</div>
+        </button>
+        <button onclick="selectSize('M')" class="size-card p-5 bg-accent-500 rounded-2xl border-2 border-accent-500 text-left text-white" data-size="M">
+          <div class="size-tag text-xs font-semibold opacity-80 mb-1">SIZE M · 선택됨</div>
+          <div class="size-title font-bold mb-1">신규 서비스</div>
+          <div class="size-desc text-sm opacity-90">1~3개월 / 화면 5~20장</div>
+        </button>
+        <button onclick="selectSize('L')" class="size-card p-5 bg-white rounded-2xl border-2 border-gray-200 text-left hover:border-accent-500 transition" data-size="L">
+          <div class="size-tag text-xs font-semibold text-gray-500 mb-1">SIZE L</div>
+          <div class="size-title font-bold text-navy-900 mb-1">플랫폼</div>
+          <div class="size-desc text-sm text-gray-500">3개월+ / 화면 20장+</div>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+        <label class="block text-sm font-semibold text-gray-700 mb-3">도메인</label>
+        <div class="flex flex-wrap gap-2" id="domainSelector">
+          <button onclick="selectDomain(this)" class="domain-btn px-4 py-2 rounded-lg bg-accent-500 text-white text-sm font-semibold" data-domain="이커머스" data-selected="true">이커머스</button>
+          <button onclick="selectDomain(this)" class="domain-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200" data-domain="SaaS">SaaS</button>
+          <button onclick="selectDomain(this)" class="domain-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200" data-domain="핀테크">핀테크</button>
+          <button onclick="selectDomain(this)" class="domain-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200" data-domain="공공">공공</button>
+          <button onclick="selectDomain(this)" class="domain-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200" data-domain="교육">교육</button>
+          <button onclick="selectDomain(this)" class="domain-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200" data-domain="헬스케어">헬스케어</button>
+          <button onclick="selectDomain(this)" class="domain-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200" data-domain="기타">기타</button>
+        </div>
+      </div>
+
+      <button onclick="goStep(2)" class="w-full bg-accent-500 hover:bg-accent-400 text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2">
+        Funnel Builder로 시작 →
+      </button>
+
+      <p class="text-center text-sm text-gray-500 mt-4">
+        💡 이미 그려둔 퍼널이 있나요? <a href="https://clooney0402.github.io/commerce.product/funnel-builder.html" target="_blank" class="text-accent-500 underline">Funnel Builder에서 불러오기</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== STEP 2: FUNNEL BUILDER (Pro Mode) ==================== -->
+  <section class="step" data-step="2">
+    <!-- Full-width dark builder -->
+    <div class="bg-[#0a1024] text-white" style="min-height: calc(100vh - 60px);">
+
+      <!-- ===== Top Toolbar ===== -->
+      <div class="bg-[#11162e] border-b border-white/5 flex items-center">
+        <!-- Brand -->
+        <div class="flex items-center gap-2 px-5 py-3 border-r border-white/5">
+          <div class="w-6 h-6 rounded bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-emerald-950">F</div>
+          <span class="text-sm font-semibold">FUNNEL <span class="text-gray-500 font-normal">/ builder</span></span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex items-center gap-1 px-3">
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span class="text-emerald-300 font-medium">신선식품 정기배송 퍼널</span>
+            <button onclick="toast('탭 닫기', 'info')" class="text-emerald-400/60 hover:text-emerald-300 ml-1">✕</button>
+          </div>
+          <button onclick="toast('새 퍼널 생성', 'info')" class="px-2 py-1.5 rounded-md text-gray-500 hover:text-white hover:bg-white/5 text-sm">+</button>
+        </div>
+
+        <!-- Right toolbar -->
+        <div class="ml-auto flex items-center gap-1 px-4 py-2">
+          <button onclick="toggleUrlSync(this)" id="urlSyncBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-white/5 text-xs text-gray-400 group">
+            <span id="urlSyncDot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+            <span>URL 동기화</span>
+          </button>
+          <button onclick="copyShareUrl()" class="flex items-center gap-2 px-4 py-1.5 rounded-md bg-emerald-500 hover:bg-emerald-400 text-emerald-950 text-xs font-bold">
+            <span>🔗</span><span>공유 URL 복사</span>
+          </button>
+          <div class="w-px h-5 bg-white/10 mx-1"></div>
+          <button onclick="toast('퍼널 Export (.json)', 'success'); setTimeout(downloadFunnelJSON, 300)" class="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-white/5 text-xs text-gray-300">
+            <span>↓</span><span>Export</span>
+          </button>
+          <button onclick="toast('퍼널 Import 대화상자', 'info')" class="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-white/5 text-xs text-gray-300">
+            <span>↑</span><span>Import</span>
+          </button>
+          <button onclick="toast('새 퍼널 시작', 'info')" class="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-white/5 text-xs text-gray-300">
+            <span>+</span><span>새 퍼널</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== 3-Column Layout ===== -->
+      <div class="flex" style="height: calc(100vh - 180px); min-height: 640px;">
+
+        <!-- Left: Node Palette + Help -->
+        <div class="w-64 bg-[#0d1228] border-r border-white/5 flex flex-col">
+          <div class="p-4 border-b border-white/5">
+            <div class="text-[11px] font-semibold text-gray-500 mb-3 tracking-wider">노드 팔레트</div>
+            <div class="space-y-1.5">
+              <div onclick="addNode('SC')" draggable="true" class="flex items-center gap-3 p-2.5 rounded-md bg-white/[0.02] border border-white/5 hover:border-blue-400/40 hover:bg-blue-500/5 cursor-grab transition">
+                <div class="w-8 h-8 rounded bg-blue-500/15 border border-blue-400/40 flex items-center justify-center font-bold text-blue-300 text-[10px]">SC</div>
+                <div class="flex-1"><div class="font-semibold text-sm">화면 (Screen)</div><div class="text-[11px] text-gray-500">페이지·화면 단위</div></div>
+                <div class="text-gray-600 text-xs">⋮⋮</div>
+              </div>
+              <div onclick="addNode('AC')" draggable="true" class="flex items-center gap-3 p-2.5 rounded-md bg-white/[0.02] border border-white/5 hover:border-orange-400/40 hover:bg-orange-500/5 cursor-grab transition">
+                <div class="w-8 h-8 rounded bg-orange-500/15 border border-orange-400/40 flex items-center justify-center font-bold text-orange-300 text-[10px]">AC</div>
+                <div class="flex-1"><div class="font-semibold text-sm">액션 (Action)</div><div class="text-[11px] text-gray-500">사용자 행동·이벤트</div></div>
+                <div class="text-gray-600 text-xs">⋮⋮</div>
+              </div>
+              <div onclick="addNode('DE')" draggable="true" class="flex items-center gap-3 p-2.5 rounded-md bg-white/[0.02] border border-white/5 hover:border-yellow-400/40 hover:bg-yellow-500/5 cursor-grab transition">
+                <div class="w-8 h-8 rounded bg-yellow-500/15 border border-yellow-400/40 flex items-center justify-center font-bold text-yellow-300 text-[10px]">DE</div>
+                <div class="flex-1"><div class="font-semibold text-sm">분기 (Decision)</div><div class="text-[11px] text-gray-500">조건·분기점</div></div>
+                <div class="text-gray-600 text-xs">⋮⋮</div>
+              </div>
+              <div onclick="addNode('EX')" draggable="true" class="flex items-center gap-3 p-2.5 rounded-md bg-white/[0.02] border border-white/5 hover:border-purple-400/40 hover:bg-purple-500/5 cursor-grab transition">
+                <div class="w-8 h-8 rounded bg-purple-500/15 border border-purple-400/40 flex items-center justify-center font-bold text-purple-300 text-[10px]">EX</div>
+                <div class="flex-1"><div class="font-semibold text-sm">완료/이탈 (Exit)</div><div class="text-[11px] text-gray-500">최종 상태</div></div>
+                <div class="text-gray-600 text-xs">⋮⋮</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 flex-1 overflow-y-auto">
+            <div class="text-[11px] font-semibold text-gray-500 mb-3 tracking-wider">사용법</div>
+            <div class="space-y-3 text-[11px] text-gray-400 leading-relaxed">
+              <div>
+                <div class="font-bold text-emerald-400 mb-1">노드 추가</div>
+                <div>· 팔레트 항목을 캔버스로 <span class="text-gray-300">드래그</span> 또는 <span class="text-gray-300">더블클릭</span></div>
+                <div>· 캔버스 빈 곳 <span class="text-gray-300">우클릭</span> → 메뉴</div>
+              </div>
+              <div>
+                <div class="font-bold text-emerald-400 mb-1">노드 연결 (3가지 방법)</div>
+                <div>· 노드 호버 시 보이는 <span class="text-emerald-300">초록 점</span>을 다른 노드로 드래그</div>
+                <div>· <span class="font-mono bg-white/5 px-1 rounded">Alt</span> 또는 <span class="font-mono bg-white/5 px-1 rounded">Shift</span> 누르고 노드를 드래그</div>
+                <div>· 노드 <span class="text-gray-300">우클릭</span> → "여기서 연결 시작"</div>
+              </div>
+              <div>
+                <div class="font-bold text-emerald-400 mb-1">기타</div>
+                <div>· 빈 곳 드래그 = 팬 / 휠 = 줌</div>
+                <div>· <span class="font-mono bg-white/5 px-1 rounded">F</span> 전체보기 / <span class="font-mono bg-white/5 px-1 rounded">Ctrl</span>+<span class="font-mono bg-white/5 px-1 rounded">D</span> 복제 / <span class="font-mono bg-white/5 px-1 rounded">Del</span> 삭제</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center: Canvas -->
+        <div class="flex-1 relative overflow-hidden" style="background-color: #0a1024; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0); background-size: 24px 24px;">
+
+          <!-- Connection lines SVG -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 1;">
+            <defs>
+              <marker id="arrowDark" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="#3a4566" />
+              </marker>
+            </defs>
+            <!-- Top row connections -->
+            <line x1="14%" y1="18%" x2="34%" y2="18%" stroke="#3a4566" stroke-width="1.5" marker-end="url(#arrowDark)" />
+            <line x1="48%" y1="18%" x2="68%" y2="18%" stroke="#3a4566" stroke-width="1.5" marker-end="url(#arrowDark)" />
+            <line x1="78%" y1="22%" x2="78%" y2="42%" stroke="#3a4566" stroke-width="1.5" marker-end="url(#arrowDark)" />
+            <line x1="78%" y1="56%" x2="78%" y2="72%" stroke="#3a4566" stroke-width="1.5" marker-end="url(#arrowDark)" />
+            <line x1="68%" y1="78%" x2="48%" y2="78%" stroke="#3a4566" stroke-width="1.5" marker-end="url(#arrowDark)" />
+            <line x1="34%" y1="78%" x2="14%" y2="78%" stroke="#3a4566" stroke-width="1.5" marker-end="url(#arrowDark)" />
+            <line x1="20%" y1="56%" x2="20%" y2="72%" stroke="#3a4566" stroke-width="1.5" stroke-dasharray="3,3" />
+            <line x1="20%" y1="48%" x2="14%" y2="22%" stroke="#3a4566" stroke-width="1.5" stroke-dasharray="3,3" />
+
+            <!-- Conversion rate labels -->
+            <text x="24%" y="14%" fill="#10b981" font-size="11" font-weight="600">100.0%</text>
+            <text x="58%" y="14%" fill="#10b981" font-size="11" font-weight="600">79.3%</text>
+            <text x="80%" y="32%" fill="#10b981" font-size="11" font-weight="600">73.5%</text>
+            <text x="80%" y="64%" fill="#10b981" font-size="11" font-weight="600">98.2%</text>
+            <text x="58%" y="84%" fill="#10b981" font-size="11" font-weight="600">75.9%</text>
+            <text x="24%" y="84%" fill="#10b981" font-size="11" font-weight="600">84.6%</text>
+          </svg>
+
+          <!-- Nodes layer -->
+          <div class="relative" style="z-index: 2; height: 100%;">
+            <!-- Row 1 -->
+            <div class="absolute" style="top: 10%; left: 3%;">
+              <div onclick="selectFunnelNode('홈/온보딩', 'SC', 'SC-001', '진입 화면 · 비로그인 미리보기 포함', 12500)" class="funnel-card group">
+                <div class="card-header"><span class="badge-sc">SC</span><span class="screen-id">SC-001</span></div>
+                <div class="card-body"><div class="card-title">홈/온보딩</div><div class="card-sub">진입 화면</div></div>
+                <div class="card-footer"><span>VISITORS</span><span class="font-mono text-white">12,500</span></div>
+              </div>
+            </div>
+            <div class="absolute" style="top: 10%; left: 35%;">
+              <div onclick="selectFunnelNode('회원가입', 'AC', 'AC-001', '카카오/Apple 소셜 로그인 + 이메일 백업', 9912)" class="funnel-card">
+                <div class="card-header"><span class="badge-ac">AC</span><span class="screen-id">AC-001</span></div>
+                <div class="card-body"><div class="card-title">회원가입</div><div class="card-sub">소셜·이메일</div></div>
+                <div class="card-footer"><span>VISITORS</span><span class="font-mono text-white">9,912</span></div>
+              </div>
+            </div>
+            <div class="absolute" style="top: 10%; left: 68%;">
+              <div onclick="selectFunnelNode('취향 설정', 'SC', 'SC-002', '제외 식재료·칼로리·알레르기 5단계 설정', 7860)" class="funnel-card">
+                <div class="card-header"><span class="badge-sc">SC</span><span class="screen-id">SC-002</span></div>
+                <div class="card-body"><div class="card-title">취향 설정</div><div class="card-sub">5단계 설문</div></div>
+                <div class="card-footer"><span>VISITORS</span><span class="font-mono text-white">7,860</span></div>
+              </div>
+            </div>
+
+            <!-- Row 2 (Decision) -->
+            <div class="absolute" style="top: 40%; left: 68%;">
+              <div onclick="selectFunnelNode('결제수단 등록?', 'DE', 'DE-001', 'YES → 식단 추천 / NO → 1주 무료 체험 안내', 7860)" class="funnel-card decision">
+                <div class="card-header"><span class="badge-de">DE</span><span class="screen-id">DE-001</span></div>
+                <div class="card-body"><div class="card-title">결제수단 등록?</div><div class="card-sub">분기 · YES/NO</div></div>
+                <div class="card-footer"><span class="text-emerald-400">YES 5,778</span><span class="text-amber-400">NO 2,082</span></div>
+              </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="absolute" style="top: 70%; left: 68%;">
+              <div onclick="selectFunnelNode('식단 추천', 'SC', 'SC-006', 'AI 주간 식단 추천 (3종 옵션)', 5778)" class="funnel-card">
+                <div class="card-header"><span class="badge-sc">SC</span><span class="screen-id">SC-006</span></div>
+                <div class="card-body"><div class="card-title">식단 추천</div><div class="card-sub">AI 주간 추천</div></div>
+                <div class="card-footer"><span>VISITORS</span><span class="font-mono text-white">5,778</span></div>
+              </div>
+            </div>
+            <div class="absolute" style="top: 70%; left: 35%;">
+              <div onclick="selectFunnelNode('자동결제', 'AC', 'AC-002', '토스페이먼츠 정기결제 · 실패 시 3회 재시도', 5673)" class="funnel-card">
+                <div class="card-header"><span class="badge-ac">AC</span><span class="screen-id">AC-002</span></div>
+                <div class="card-body"><div class="card-title">자동결제</div><div class="card-sub">토스페이먼츠</div></div>
+                <div class="card-footer"><span>VISITORS</span><span class="font-mono text-white">5,673</span></div>
+              </div>
+            </div>
+            <div class="absolute" style="top: 70%; left: 3%;">
+              <div onclick="selectFunnelNode('배송 완료', 'EX', 'EX-001', '새벽배송 완료 · 알림 발송', 4799)" class="funnel-card">
+                <div class="card-header"><span class="badge-ex">EX</span><span class="screen-id">EX-001</span></div>
+                <div class="card-body"><div class="card-title">배송 완료</div><div class="card-sub">최종 전환</div></div>
+                <div class="card-footer"><span>VISITORS</span><span class="font-mono text-emerald-300">4,799</span></div>
+              </div>
+            </div>
+
+            <!-- Side Decision -->
+            <div class="absolute" style="top: 40%; left: 3%;">
+              <div onclick="selectFunnelNode('일시정지?', 'DE', 'DE-002', '4주 이상 일시정지 시 자동 알림 + 해지 안내', 1280)" class="funnel-card decision">
+                <div class="card-header"><span class="badge-de">DE</span><span class="screen-id">DE-002</span></div>
+                <div class="card-body"><div class="card-title">일시정지?</div><div class="card-sub">자동 해지 정책</div></div>
+                <div class="card-footer"><span class="text-amber-400">PAUSE 1,280</span><span class="text-gray-500">15.4%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating: Canvas info (top-left) -->
+          <div class="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/5 backdrop-blur border border-white/5 text-[11px] text-gray-400 z-10">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span class="text-gray-300">자동 저장됨</span>
+            <span class="text-gray-600">·</span>
+            <span class="font-mono">funnel_FRESH-MEAL_v3</span>
+          </div>
+
+          <!-- Floating: Zoom controls (bottom-left) -->
+          <div class="absolute bottom-4 left-4 flex flex-col bg-[#11162e] border border-white/5 rounded-lg overflow-hidden z-10">
+            <button onclick="zoomCanvas('+')" class="w-9 h-9 hover:bg-white/5 text-lg">+</button>
+            <div class="px-2 py-1 text-[10px] text-center text-gray-400 border-y border-white/5" id="zoomLevel">53%</div>
+            <button onclick="zoomCanvas('-')" class="w-9 h-9 hover:bg-white/5 text-lg">−</button>
+            <div class="border-t border-white/5">
+              <button onclick="zoomCanvas('fit')" title="전체보기 (F)" class="w-9 h-9 hover:bg-white/5 flex items-center justify-center">⛶</button>
+            </div>
+          </div>
+
+          <!-- Floating: Mini-map (bottom-right) -->
+          <div class="absolute bottom-4 right-4 w-44 h-28 bg-[#11162e]/90 backdrop-blur border border-white/5 rounded-lg p-1.5 z-10">
+            <div class="text-[10px] text-gray-500 mb-0.5 px-1">미니맵</div>
+            <svg viewBox="0 0 160 90" class="w-full h-[calc(100%-14px)]">
+              <rect x="2" y="2" width="156" height="86" fill="#0a1024" rx="2" />
+              <!-- Mini nodes -->
+              <rect x="8" y="14" width="22" height="12" fill="#3b82f6" rx="2" />
+              <rect x="48" y="14" width="22" height="12" fill="#f59e0b" rx="2" />
+              <rect x="88" y="14" width="22" height="12" fill="#3b82f6" rx="2" />
+              <rect x="88" y="38" width="22" height="12" fill="#eab308" rx="2" transform="rotate(-2 99 44)" />
+              <rect x="88" y="62" width="22" height="12" fill="#3b82f6" rx="2" />
+              <rect x="48" y="62" width="22" height="12" fill="#f59e0b" rx="2" />
+              <rect x="8" y="62" width="22" height="12" fill="#a855f7" rx="2" />
+              <rect x="8" y="38" width="22" height="12" fill="#eab308" rx="2" transform="rotate(2 19 44)" />
+              <!-- Viewport -->
+              <rect x="4" y="8" width="152" height="76" fill="none" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2" rx="2" />
+            </svg>
+          </div>
+
+        </div>
+
+        <!-- Right: Properties Panel -->
+        <div id="propsPanel" class="w-72 bg-[#0d1228] border-l border-white/5 flex flex-col">
+          <div class="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+            <div class="text-xs text-gray-400">노드 / <span id="propBreadcrumb" class="text-gray-300">완료/이탈</span></div>
+            <div class="text-[10px] text-gray-600 font-mono" id="propNodeId">N_ZY6UC07</div>
+          </div>
+
+          <div class="p-4 flex-1 overflow-y-auto space-y-4">
+            <!-- Type -->
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-1.5 font-semibold tracking-wider">유형</label>
+              <select id="propType" class="w-full bg-[#0a1024] border border-white/10 rounded-md px-3 py-2 text-sm focus:border-emerald-500 outline-none">
+                <option>완료/이탈 (EX)</option>
+                <option>화면 (SC)</option>
+                <option>액션 (AC)</option>
+                <option>분기 (DE)</option>
+              </select>
+            </div>
+
+            <!-- Title -->
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-1.5 font-semibold tracking-wider">제목 *</label>
+              <input id="propTitle" type="text" value="배송 완료" class="w-full bg-[#0a1024] border border-white/10 rounded-md px-3 py-2 text-sm focus:border-emerald-500 outline-none" />
+            </div>
+
+            <!-- Screen ID -->
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-1.5 font-semibold tracking-wider">화면 ID / Screen ID</label>
+              <input id="propScreenId" type="text" value="EX-001" class="w-full bg-[#0a1024] border border-white/10 rounded-md px-3 py-2 text-sm font-mono focus:border-emerald-500 outline-none" />
+              <div class="text-[10px] text-gray-600 mt-1">디자인 명세서나 PRD에서 사용하는 식별자</div>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-1.5 font-semibold tracking-wider">설명</label>
+              <textarea id="propDesc" rows="3" class="w-full bg-[#0a1024] border border-white/10 rounded-md px-3 py-2 text-sm focus:border-emerald-500 outline-none resize-none">새벽배송 완료 · 알림 발송</textarea>
+            </div>
+
+            <!-- Reference image -->
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-1.5 font-semibold tracking-wider">참조 이미지 (URL 또는 업로드)</label>
+              <input type="text" placeholder="https:// 또는 비워두기" class="w-full bg-[#0a1024] border border-white/10 rounded-md px-3 py-2 text-xs focus:border-emerald-500 outline-none" />
+              <div class="mt-2 flex items-center gap-2">
+                <button onclick="toast('파일 선택 대화상자', 'info')" class="px-3 py-1 rounded bg-white/5 hover:bg-white/10 text-xs">파일 선택</button>
+                <span class="text-[10px] text-gray-600">선택된 파일 없음</span>
+              </div>
+            </div>
+
+            <!-- Conversion data -->
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-2 font-semibold tracking-wider">전환 데이터</label>
+              <div class="bg-[#0a1024] border border-white/10 rounded-md p-3 mb-2">
+                <div class="text-[10px] text-gray-500 mb-1">자동 계산된 방문자</div>
+                <div class="text-2xl font-bold font-mono" id="propVisitors">4,799</div>
+                <div class="text-[10px] text-gray-500 mt-1">들어오는 연결선의 1개 합계</div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="bg-[#0a1024] border border-white/10 rounded-md p-2.5">
+                  <div class="text-[10px] text-gray-500 mb-0.5">IN</div>
+                  <div class="text-lg font-bold font-mono" id="propIn">1</div>
+                </div>
+                <div class="bg-[#0a1024] border border-white/10 rounded-md p-2.5">
+                  <div class="text-[10px] text-gray-500 mb-0.5">OUT</div>
+                  <div class="text-lg font-bold font-mono" id="propOut">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-white/5">
+            <button onclick="toast('노드 삭제', 'warning')" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-md bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-sm font-semibold">
+              <span>🗑</span><span>노드 삭제</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Status & CTA bar -->
+      <div class="bg-[#11162e] border-t border-white/5 px-6 py-3 flex items-center gap-4">
+        <div class="flex items-center gap-4 text-xs text-gray-400">
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-blue-400"></span>Screen <span class="text-white font-mono">3</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-orange-400"></span>Action <span class="text-white font-mono">2</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-yellow-400"></span>Decision <span class="text-white font-mono">2</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-purple-400"></span>Exit <span class="text-white font-mono">1</span></div>
+          <div class="text-gray-600">·</div>
+          <div id="nodeCount">총 <span class="text-white font-mono">8</span>개 노드 / <span class="text-white font-mono">7</span>개 연결</div>
+          <div class="text-gray-600">·</div>
+          <div>전환율 <span class="text-emerald-400 font-mono font-bold">38.4%</span></div>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2">
+          <button onclick="toast('퍼널 자동 정렬 완료', 'success')" class="px-3 py-2 rounded-md bg-white/5 hover:bg-white/10 text-xs text-gray-300">↻ 자동 정렬</button>
+          <button onclick="goStep(3)" class="px-6 py-2 rounded-md bg-accent-500 hover:bg-accent-400 text-white text-sm font-bold flex items-center gap-2 pulse">
+            <span>✨</span><span>AI에게 PRD 요청하기</span><span>→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .funnel-card {
+      width: 200px;
+      background: linear-gradient(180deg, #1a2243 0%, #141b35 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .funnel-card:hover {
+      border-color: rgba(16, 185, 129, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+    }
+    .funnel-card.decision {
+      transform: rotate(-1deg);
+    }
+    .funnel-card.decision:hover {
+      transform: rotate(-1deg) translateY(-2px);
+    }
+    .funnel-card .card-header {
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.2);
+    }
+    .funnel-card .card-body {
+      padding: 12px;
+    }
+    .funnel-card .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 2px;
+    }
+    .funnel-card .card-sub {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .funnel-card .card-footer {
+      padding: 6px 12px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748b;
+    }
+    .badge-sc, .badge-ac, .badge-de, .badge-ex {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .badge-sc { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+    .badge-ac { background: rgba(249, 115, 22, 0.2); color: #fdba74; }
+    .badge-de { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+    .badge-ex { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+    .screen-id {
+      font-size: 10px;
+      color: #64748b;
+      font-family: ui-monospace, monospace;
+    }
+  </style>
+
+  <!-- ==================== STEP 3: AI CLARIFYING ==================== -->
+  <section class="step" data-step="3">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="mb-6">
+        <div class="inline-block px-3 py-1 rounded-full bg-accent-500/10 text-accent-500 text-sm font-semibold mb-3">STEP 3 · AI 클래리파잉</div>
+        <h2 class="text-3xl font-bold text-navy-900 mb-2">25년차 PM이 누락 요건을 짚어드립니다</h2>
+        <p class="text-gray-600">퍼널 노드를 직접 참조한 컨텍스트 인식 질문 · 약 2분 소요</p>
+      </div>
+
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 md:col-span-7">
+          <div class="bg-white rounded-2xl border border-gray-200 p-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-100 mb-4">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent-500 to-accent-400 flex items-center justify-center font-bold text-white">AI</div>
+              <div>
+                <div class="font-bold text-navy-900">Specwise PM</div>
+                <div class="text-xs text-gray-500">한국 SI 25년차 시니어 PM 페르소나</div>
+              </div>
+              <div class="ml-auto text-xs text-gray-500"><span id="qProgress">5</span>/8</div>
+            </div>
+
+            <div id="chatArea" class="space-y-4 max-h-[480px] overflow-y-auto">
+              <div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-accent-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">AI</div><div class="flex-1 bg-gray-50 rounded-2xl rounded-tl-sm p-4"><div class="text-xs text-accent-500 font-semibold mb-1">Q1 · [Screen: 홈/온보딩]</div><div class="text-sm text-gray-800">홈 화면에서 비로그인 사용자에게 보여줄 콘텐츠가 어떻게 되나요? 1인 가구 타겟이라면 <strong>"내 식단 미리보기"</strong> 같은 비로그인 체험 단계도 필요할 텐데요.</div></div></div>
+              <div class="flex justify-end"><div class="bg-accent-500 text-white rounded-2xl rounded-tr-sm p-3 max-w-md text-sm">샘플 식단 3종 + 가격 시뮬레이터로 가시겠습니다</div></div>
+
+              <div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-accent-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">AI</div><div class="flex-1 bg-gray-50 rounded-2xl rounded-tl-sm p-4"><div class="text-xs text-accent-500 font-semibold mb-1">Q2 · [Action: 회원가입]</div><div class="text-sm text-gray-800">소셜 로그인은 어떻게 가져갈까요? 카카오/네이버/Apple 중 우선순위가 어떻게 되시나요? <strong>이메일 가입은 거의 안 쓰일 겁니다.</strong></div></div></div>
+              <div class="flex justify-end"><div class="bg-accent-500 text-white rounded-2xl rounded-tr-sm p-3 max-w-md text-sm">카카오 1순위, Apple 2순위. 이메일은 백업으로</div></div>
+
+              <div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-accent-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">AI</div><div class="flex-1 bg-gray-50 rounded-2xl rounded-tl-sm p-4"><div class="text-xs text-accent-500 font-semibold mb-1">Q3 · [Decision: 결제수단 등록?]</div><div class="text-sm text-gray-800">결제수단 미등록 사용자는 어떤 경로로 안내하시나요? <strong>이탈 방지를 위한 "체험 1주차 무료"</strong> 같은 정책 검토 필요합니다.</div></div></div>
+              <div class="flex justify-end"><div class="bg-accent-500 text-white rounded-2xl rounded-tr-sm p-3 max-w-md text-sm">첫 1주 무료 + 결제수단 미등록도 식단 추천은 보여주기로</div></div>
+
+              <div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-accent-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">AI</div><div class="flex-1 bg-gray-50 rounded-2xl rounded-tl-sm p-4"><div class="text-xs text-accent-500 font-semibold mb-1">Q4 · [Action: 자동결제]</div><div class="text-sm text-gray-800">PG는 어떤 걸 쓰실 계획인가요? 정기결제는 토스/포트원이 한국에서 안정적입니다. <strong>결제 실패 시 재시도 정책</strong>도 미리 정해두면 좋겠습니다.</div></div></div>
+              <div class="flex justify-end"><div class="bg-accent-500 text-white rounded-2xl rounded-tr-sm p-3 max-w-md text-sm">토스페이먼츠 + 결제 실패 시 3회 재시도 후 일시정지</div></div>
+
+              <div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-accent-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">AI</div><div class="flex-1 bg-gray-50 rounded-2xl rounded-tl-sm p-4"><div class="text-xs text-accent-500 font-semibold mb-1">Q5 · [Decision: 일시정지?]</div><div class="text-sm text-gray-800">일시정지는 자동 재개 시점이 정해져 있나요? 사용자가 깜빡 잊고 재개 안 하면 매출 손실인데, <strong>4주 이상 일시정지 시 자동 해지 또는 알림</strong> 정책이 필요해 보입니다.</div></div></div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+              <input id="answerInput" type="text" placeholder="답변 입력 (Enter로 전송)..." class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm" />
+              <button onclick="sendAnswer()" class="px-5 bg-accent-500 hover:bg-accent-400 text-white rounded-xl font-semibold text-sm">전송</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-12 md:col-span-5">
+          <div class="bg-white rounded-2xl border border-gray-200 p-5 sticky top-20">
+            <div class="text-xs font-semibold text-gray-500 mb-3">참조 중인 노드 (실시간)</div>
+            <div class="space-y-2 mb-5">
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200 funnel-node highlight">
+                <div class="w-10 h-10 rounded-lg bg-yellow-500 text-white flex items-center justify-center font-bold text-xs">DE</div>
+                <div><div class="font-bold text-sm">일시정지?</div><div class="text-xs text-gray-500">현재 질문 중</div></div>
+              </div>
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200 opacity-60">
+                <div class="w-10 h-10 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-xs">SC</div>
+                <div><div class="font-bold text-sm">홈/온보딩</div><div class="text-xs text-gray-500">✓ 완료</div></div>
+              </div>
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200 opacity-60">
+                <div class="w-10 h-10 rounded-lg bg-green-500 text-white flex items-center justify-center font-bold text-xs">AC</div>
+                <div><div class="font-bold text-sm">회원가입</div><div class="text-xs text-gray-500">✓ 완료</div></div>
+              </div>
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200 opacity-60">
+                <div class="w-10 h-10 rounded-lg bg-yellow-500 text-white flex items-center justify-center font-bold text-xs">DE</div>
+                <div><div class="font-bold text-sm">결제수단 등록?</div><div class="text-xs text-gray-500">✓ 완료</div></div>
+              </div>
+            </div>
+
+            <div class="bg-accent-500/5 border border-accent-500/30 rounded-xl p-4 mb-4">
+              <div class="text-xs text-accent-500 font-semibold mb-1">💡 발견된 누락 요건</div>
+              <div class="text-sm text-gray-700">
+                · 비로그인 체험 화면<br/>
+                · 결제 실패 재시도 정책<br/>
+                · 일시정지 자동해지 정책<br/>
+                · 알림(푸시/이메일) 정책
+              </div>
+            </div>
+
+            <button onclick="goStep(4)" class="w-full bg-navy-900 hover:bg-navy-800 text-white font-bold py-3 rounded-xl text-sm">
+              건너뛰고 PRD 생성 →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== STEP 4: PRD GENERATED ==================== -->
+  <section class="step" data-step="4">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="inline-block px-3 py-1 rounded-full bg-accent-500/10 text-accent-500 text-sm font-semibold mb-3">STEP 4 · PRD 자동 생성 완료</div>
+          <h2 class="text-3xl font-bold text-navy-900 mb-2">신선식품 정기배송 서비스 — PRD v1.0</h2>
+          <p class="text-gray-600">생성 시간 4분 12초 · 8개 섹션 · 12개 화면 식별</p>
+        </div>
+        <div class="flex flex-wrap gap-2 no-print">
+          <button onclick="downloadMarkdown()" class="px-4 py-2 rounded-lg bg-accent-500 hover:bg-accent-400 text-white text-sm font-semibold flex items-center gap-2">📝 .md 다운로드</button>
+          <button onclick="downloadJSON()" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm font-semibold flex items-center gap-2">{ } JSON</button>
+          <button onclick="downloadDocx()" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm font-semibold flex items-center gap-2">📄 Word</button>
+          <button onclick="window.print()" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm font-semibold flex items-center gap-2">🖨️ PDF</button>
+          <button onclick="copyToClipboard()" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm font-semibold flex items-center gap-2">📋 복사</button>
+          <button onclick="shareLink()" class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm font-semibold flex items-center gap-2">🔗 공유</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 md:col-span-3 no-print">
+          <div class="bg-white rounded-2xl border border-gray-200 p-4 sticky top-20">
+            <div class="text-xs font-semibold text-gray-500 mb-3">목차</div>
+            <div class="space-y-1 text-sm">
+              <button onclick="scrollToSection('sec1')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">1. 프로젝트 개요</button>
+              <button onclick="scrollToSection('sec2')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">2. 사용자 정의</button>
+              <button onclick="scrollToSection('sec3')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">3. 기능 요건</button>
+              <button onclick="scrollToSection('sec4')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">4. 비기능 요건</button>
+              <button onclick="scrollToSection('sec5')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">5. 화면 목록</button>
+              <button onclick="scrollToSection('sec6')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">6. 비즈니스 룰</button>
+              <button onclick="scrollToSection('sec7')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">7. 일정·공수</button>
+              <button onclick="scrollToSection('sec8')" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent-500/10 hover:text-accent-500 text-gray-700">8. 가정·리스크</button>
+            </div>
+
+            <div class="mt-5 pt-5 border-t border-gray-100 text-xs text-gray-500">
+              <div class="flex items-center gap-2 mb-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span>Funnel 자동 매핑</div>
+              <div class="flex items-center gap-2 mb-2"><span class="w-2 h-2 rounded-full bg-yellow-500"></span>AI 클래리파잉 반영</div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-gray-400"></span>편집 가능</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-12 md:col-span-9">
+          <div class="bg-white rounded-2xl border border-gray-200 p-8" id="prdContent">
+            <h1 class="text-2xl font-bold text-navy-900 mb-1">신선식품 정기배송 서비스</h1>
+            <div class="text-sm text-gray-500 mb-6">PRD v1.0 · Generated by Specwise · 2026-05-07</div>
+
+            <div id="sec1" class="mb-8 scroll-mt-20">
+              <h2 class="text-xl font-bold text-navy-900 mb-4 pb-2 border-b border-gray-200">1. 프로젝트 개요</h2>
+              <div class="mb-4">
+                <div class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">1.1 배경 및 목적<span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Funnel 매핑</span></div>
+                <p class="text-sm text-gray-700 leading-relaxed">1인 가구 증가에 따른 식재료 구매·식단 고민의 페인을 해결한다. AI 식단 추천 기반 정기배송으로 사용자의 의사결정 비용을 0에 가깝게 만든다.</p>
+              </div>
+              <div class="mb-4">
+                <div class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">1.2 범위 (In Scope)<span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Funnel 매핑</span></div>
+                <ul class="text-sm text-gray-700 space-y-1 ml-4">
+                  <li>• 회원가입 / 로그인 (카카오, Apple, 이메일 백업)</li>
+                  <li>• 식단 취향 설정 (제외 식재료, 칼로리, 알레르기)</li>
+                  <li>• AI 주간 식단 추천</li>
+                  <li>• 정기결제 (토스페이먼츠 연동)</li>
+                  <li>• 일시정지 / 재개 / 해지</li>
+                  <li>• 새벽배송 추적</li>
+                  <li>• 1주 무료 체험 (비로그인 미리보기 포함)</li>
+                </ul>
+              </div>
+              <div>
+                <div class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">1.3 범위 (Out of Scope · v1)<span class="text-[10px] px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">AI 클래리파잉</span></div>
+                <ul class="text-sm text-gray-700 space-y-1 ml-4">
+                  <li>• 사용자 간 식단 공유 / 소셜 기능</li>
+                  <li>• 영양사 1:1 상담</li>
+                  <li>• B2B(기업 복지) 결제</li>
+                </ul>
+              </div>
+            </div>
+
+            <div id="sec3" class="mb-8 scroll-mt-20">
+              <h2 class="text-xl font-bold text-navy-900 mb-4 pb-2 border-b border-gray-200">3. 기능 요건 (요약)</h2>
+              <div class="overflow-hidden rounded-lg border border-gray-200">
+                <table class="w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr class="text-left">
+                      <th class="p-3 font-semibold text-gray-700">ID</th>
+                      <th class="p-3 font-semibold text-gray-700">기능</th>
+                      <th class="p-3 font-semibold text-gray-700">출처 노드</th>
+                      <th class="p-3 font-semibold text-gray-700">우선순위</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200">
+                    <tr><td class="p-3 font-mono text-xs">F-001</td><td class="p-3">홈 화면 + 비로그인 미리보기</td><td class="p-3 text-blue-600 text-xs">SC: 홈/온보딩</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Must</span></td></tr>
+                    <tr><td class="p-3 font-mono text-xs">F-002</td><td class="p-3">소셜 로그인 (카카오/Apple)</td><td class="p-3 text-green-600 text-xs">AC: 회원가입</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Must</span></td></tr>
+                    <tr><td class="p-3 font-mono text-xs">F-003</td><td class="p-3">식단 취향 설정 (5개 항목)</td><td class="p-3 text-blue-600 text-xs">SC: 취향 설정</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Must</span></td></tr>
+                    <tr><td class="p-3 font-mono text-xs">F-004</td><td class="p-3">결제수단 등록 분기 처리</td><td class="p-3 text-yellow-600 text-xs">DE: 결제수단</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Must</span></td></tr>
+                    <tr><td class="p-3 font-mono text-xs">F-005</td><td class="p-3">AI 주간 식단 추천</td><td class="p-3 text-blue-600 text-xs">SC: 식단 추천</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Must</span></td></tr>
+                    <tr><td class="p-3 font-mono text-xs">F-006</td><td class="p-3">정기결제 + 실패 재시도 3회</td><td class="p-3 text-green-600 text-xs">AC: 자동결제</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Must</span></td></tr>
+                    <tr><td class="p-3 font-mono text-xs">F-007</td><td class="p-3">일시정지 / 4주 후 자동 알림</td><td class="p-3 text-yellow-600 text-xs">DE: 일시정지</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-orange-100 text-orange-700 text-xs">Should</span></td></tr>
+                    <tr><td class="p-3 font-mono text-xs">F-008</td><td class="p-3">배송 추적 + 완료 알림</td><td class="p-3 text-purple-600 text-xs">EX: 배송 완료</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-orange-100 text-orange-700 text-xs">Should</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-3 text-xs text-gray-500">💡 위 기능 ID는 Funnel Builder의 노드와 1:1 매핑되며, 노드 수정 시 PRD가 자동 업데이트됩니다.</div>
+            </div>
+
+            <div id="sec5" class="mb-8 scroll-mt-20">
+              <h2 class="text-xl font-bold text-navy-900 mb-4 pb-2 border-b border-gray-200">5. 화면 목록 (12종)</h2>
+              <div class="grid md:grid-cols-2 gap-2 text-sm">
+                <div class="p-3 rounded-lg border border-gray-200">SC-001 · 홈 (비로그인)</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-002 · 식단 미리보기</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-003 · 회원가입 / 로그인</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-004 · 취향 설정 (5단계)</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-005 · 결제수단 등록</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-006 · 주간 식단 추천</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-007 · 식단 변경/스킵</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-008 · 결제 내역</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-009 · 배송 추적</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-010 · 일시정지 / 재개</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-011 · 마이페이지</div>
+                <div class="p-3 rounded-lg border border-gray-200">SC-012 · 알림 설정</div>
+              </div>
+            </div>
+
+            <div id="sec7" class="mb-8 scroll-mt-20">
+              <h2 class="text-xl font-bold text-navy-900 mb-4 pb-2 border-b border-gray-200">7. 일정·공수 추정</h2>
+              <div class="overflow-hidden rounded-lg border border-gray-200">
+                <table class="w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr><th class="p-3 text-left">단계</th><th class="p-3 text-left">기간</th><th class="p-3 text-left">투입 인원</th></tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200">
+                    <tr><td class="p-3">기획·UI 설계</td><td class="p-3">2주</td><td class="p-3">PM 1, 디자이너 1</td></tr>
+                    <tr><td class="p-3">프론트엔드 개발</td><td class="p-3">3주</td><td class="p-3">FE 1</td></tr>
+                    <tr><td class="p-3">백엔드 + 결제 연동</td><td class="p-3">3주</td><td class="p-3">BE 1</td></tr>
+                    <tr><td class="p-3">QA + 배포</td><td class="p-3">1주</td><td class="p-3">QA 1</td></tr>
+                    <tr class="bg-accent-500/5"><td class="p-3 font-bold">합계</td><td class="p-3 font-bold">6주</td><td class="p-3 font-bold">4명 동시 투입</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <button onclick="goStep(5)" class="w-full bg-accent-500 hover:bg-accent-400 text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 no-print">
+              다음 단계 가이드 보기 →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== STEP 5: NEXT STEPS ==================== -->
+  <section class="step" data-step="5">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="mb-8 text-center">
+        <div class="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-3">✓ STEP 5 · 다음 단계</div>
+        <h2 class="text-4xl font-bold text-navy-900 mb-3">PRD가 준비됐습니다. 다음으로 가시죠</h2>
+        <p class="text-gray-600 text-lg">5분 안에 완성. 이제 다음 단계로 이어가세요.</p>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-4 mb-10">
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 text-center"><div class="text-4xl font-bold text-accent-500 mb-1">12</div><div class="text-sm text-gray-600">식별된 화면</div></div>
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 text-center"><div class="text-4xl font-bold text-accent-500 mb-1">28</div><div class="text-sm text-gray-600">기능 요건</div></div>
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 text-center"><div class="text-4xl font-bold text-accent-500 mb-1">6주</div><div class="text-sm text-gray-600">예상 개발 기간</div></div>
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 text-center"><div class="text-4xl font-bold text-accent-500 mb-1">96%</div><div class="text-sm text-gray-600">시간 절감 (vs 수동)</div></div>
+      </div>
+
+      <h3 class="text-2xl font-bold text-navy-900 mb-4">🎨 산출물 이어가기</h3>
+      <div class="grid md:grid-cols-2 gap-6 mb-10">
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-2xl">🎨</div>
+            <div class="flex-1">
+              <div class="font-bold text-navy-900 text-lg mb-1">와이어프레임 시작</div>
+              <div class="text-sm text-gray-600">12개 화면 목록을 자동으로 보내드립니다</div>
+            </div>
+          </div>
+          <div class="space-y-2 mb-4 text-sm">
+            <div class="flex items-center gap-2 text-gray-700">✓ 화면별 핵심 요소 자동 추출</div>
+            <div class="flex items-center gap-2 text-gray-700">✓ 도구 선택 가능</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="openExcalidraw()" class="px-4 py-3 rounded-lg bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold">Excalidraw 열기</button>
+            <button onclick="openFigma()" class="px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold">Figma 열기</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-2xl">⚡</div>
+            <div class="flex-1">
+              <div class="font-bold text-navy-900 text-lg mb-1">프로토타입 빌드</div>
+              <div class="text-sm text-gray-600">PRD를 v0/Bolt에 자동 전송합니다</div>
+            </div>
+          </div>
+          <div class="space-y-2 mb-4 text-sm">
+            <div class="flex items-center gap-2 text-gray-700">✓ 기능 요건 자동 변환</div>
+            <div class="flex items-center gap-2 text-gray-700">✓ 한국어 UI 컴포넌트</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="sendToV0()" class="px-4 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold">v0로 보내기</button>
+            <button onclick="sendToBolt()" class="px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold">Bolt.new</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 opacity-75">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-2xl">✅</div>
+            <div class="flex-1">
+              <div class="font-bold text-navy-900 text-lg mb-1">QA 케이스 자동 생성 <span class="text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-600 ml-2">V2</span></div>
+              <div class="text-sm text-gray-600">기능별 QA 시나리오 자동 생성</div>
+            </div>
+          </div>
+          <button onclick="toast('V2 출시 예정 — 사전알림 신청됨', 'info')" class="w-full px-4 py-3 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold">사전 알림 신청</button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 opacity-75">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center text-2xl">📖</div>
+            <div class="flex-1">
+              <div class="font-bold text-navy-900 text-lg mb-1">사용자 매뉴얼 <span class="text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-600 ml-2">V3</span></div>
+              <div class="text-sm text-gray-600">화면별 매뉴얼 + 스크린샷 자동 구성</div>
+            </div>
+          </div>
+          <button onclick="toast('V3 출시 예정 — 사전알림 신청됨', 'info')" class="w-full px-4 py-3 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold">사전 알림 신청</button>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-accent-500 to-accent-400 rounded-3xl p-10 text-white text-center mb-10">
+        <div class="text-sm font-semibold opacity-80 mb-3 tracking-wider">고객 ROI</div>
+        <div class="text-5xl font-bold mb-3">이 프로젝트만 <span class="underline decoration-2 underline-offset-4">19시간 절감</span></div>
+        <div class="text-lg opacity-90 mb-8">PM 시급 50,000원 기준 <strong>월 95만원</strong> 가치</div>
+        <div class="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+          <div><div class="text-3xl font-bold mb-1">4분 12초</div><div class="text-sm opacity-80">PRD 생성 시간</div></div>
+          <div><div class="text-3xl font-bold mb-1">vs 4시간</div><div class="text-sm opacity-80">기존 수동 작성</div></div>
+          <div><div class="text-3xl font-bold mb-1">98% ↓</div><div class="text-sm opacity-80">시간 단축</div></div>
+        </div>
+      </div>
+
+      <button onclick="goStep(6)" class="w-full bg-navy-900 hover:bg-navy-800 text-white font-bold py-5 rounded-2xl flex items-center justify-center gap-3 text-lg pulse">
+        🚀 AX Studio로 이동 — 자동화 파이프라인 →
+      </button>
+    </div>
+  </section>
+
+  <!-- ==================== STEP 6: AX STUDIO ==================== -->
+  <section class="step" data-step="6">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="mb-8">
+        <div class="inline-block px-3 py-1 rounded-full bg-accent-500/10 text-accent-500 text-sm font-semibold mb-3">STEP 6 · AX Studio</div>
+        <h2 class="text-4xl font-bold text-navy-900 mb-3">자동화 파이프라인</h2>
+        <p class="text-gray-600 text-lg">PRD → 코드 저장소 → 배포 → 협업 도구까지. <strong class="text-accent-500">한 번에 자동화.</strong></p>
+      </div>
+
+      <!-- Pipeline Visualization -->
+      <div class="bg-gradient-to-r from-navy-900 to-navy-800 rounded-3xl p-8 mb-8 text-white">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <div class="text-xs font-semibold text-accent-300 mb-1 tracking-wider">PIPELINE</div>
+            <div class="text-2xl font-bold">전체 자동화 흐름</div>
+          </div>
+          <button onclick="runFullPipeline()" id="pipelineBtn" class="px-6 py-3 rounded-xl bg-accent-500 hover:bg-accent-400 font-bold flex items-center gap-2">
+            <span id="pipelineBtnText">⚡ 전체 파이프라인 실행</span>
+          </button>
+        </div>
+        <div class="grid grid-cols-5 gap-3 items-center">
+          <div class="pipeline-step text-center" data-stage="1">
+            <div class="w-14 h-14 mx-auto mb-2 rounded-2xl bg-white/10 flex items-center justify-center text-2xl border border-white/20">📄</div>
+            <div class="text-xs font-semibold">PRD 생성</div>
+            <div class="text-[10px] text-white/60 mt-1">완료</div>
+          </div>
+          <div class="text-center text-white/40">→</div>
+          <div class="pipeline-step text-center" data-stage="2">
+            <div class="w-14 h-14 mx-auto mb-2 rounded-2xl bg-white/10 flex items-center justify-center text-2xl border border-white/20">📦</div>
+            <div class="text-xs font-semibold">Markdown</div>
+            <div class="text-[10px] text-white/60 mt-1">대기 중</div>
+          </div>
+          <div class="text-center text-white/40">→</div>
+          <div class="pipeline-step text-center" data-stage="3">
+            <div class="w-14 h-14 mx-auto mb-2 rounded-2xl bg-white/10 flex items-center justify-center text-2xl border border-white/20">🐙</div>
+            <div class="text-xs font-semibold">GitHub Repo</div>
+            <div class="text-[10px] text-white/60 mt-1">대기 중</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-5 gap-3 items-center mt-3">
+          <div class="text-center text-white/40">↓</div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div class="text-center text-white/40">↓</div>
+        </div>
+        <div class="grid grid-cols-5 gap-3 items-center mt-3">
+          <div class="pipeline-step text-center" data-stage="5">
+            <div class="w-14 h-14 mx-auto mb-2 rounded-2xl bg-white/10 flex items-center justify-center text-2xl border border-white/20">📊</div>
+            <div class="text-xs font-semibold">모니터링</div>
+            <div class="text-[10px] text-white/60 mt-1">대기 중</div>
+          </div>
+          <div class="text-center text-white/40">←</div>
+          <div></div>
+          <div class="text-center text-white/40">←</div>
+          <div class="pipeline-step text-center" data-stage="4">
+            <div class="w-14 h-14 mx-auto mb-2 rounded-2xl bg-white/10 flex items-center justify-center text-2xl border border-white/20">🚀</div>
+            <div class="text-xs font-semibold">자동 배포</div>
+            <div class="text-[10px] text-white/60 mt-1">대기 중</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="bg-white rounded-2xl border border-gray-200 mb-8">
+        <div class="border-b border-gray-200 flex overflow-x-auto">
+          <button onclick="switchTab('export')" data-tab="export" class="ax-tab active px-6 py-4 font-semibold text-sm whitespace-nowrap">📦 산출물 내보내기</button>
+          <button onclick="switchTab('github')" data-tab="github" class="ax-tab px-6 py-4 font-semibold text-sm whitespace-nowrap">🐙 GitHub 연동</button>
+          <button onclick="switchTab('deploy')" data-tab="deploy" class="ax-tab px-6 py-4 font-semibold text-sm whitespace-nowrap">🚀 자동 배포</button>
+          <button onclick="switchTab('collab')" data-tab="collab" class="ax-tab px-6 py-4 font-semibold text-sm whitespace-nowrap">🤝 협업 도구</button>
+          <button onclick="switchTab('agents')" data-tab="agents" class="ax-tab px-6 py-4 font-semibold text-sm whitespace-nowrap">🤖 AI 에이전트</button>
+        </div>
+
+        <!-- Tab: Export -->
+        <div id="tab-export" class="ax-tab-content p-8 active">
+          <h3 class="text-xl font-bold text-navy-900 mb-2">PRD를 원하는 포맷으로</h3>
+          <p class="text-sm text-gray-600 mb-6">한 번 생성한 PRD를 6가지 포맷으로 즉시 내보내기.</p>
+          <div class="grid md:grid-cols-3 gap-4">
+            <button onclick="downloadMarkdown()" class="export-card p-5 rounded-xl border-2 border-gray-200 hover:border-accent-500 hover:bg-accent-500/5 transition text-left group">
+              <div class="text-3xl mb-3">📝</div>
+              <div class="font-bold mb-1 text-navy-900">Markdown (.md)</div>
+              <div class="text-xs text-gray-500 mb-3">GitHub README · Notion 호환</div>
+              <div class="text-xs text-accent-500 font-semibold group-hover:underline">다운로드 →</div>
+            </button>
+            <button onclick="downloadDocx()" class="export-card p-5 rounded-xl border-2 border-gray-200 hover:border-accent-500 hover:bg-accent-500/5 transition text-left group">
+              <div class="text-3xl mb-3">📄</div>
+              <div class="font-bold mb-1 text-navy-900">Word (.docx)</div>
+              <div class="text-xs text-gray-500 mb-3">한국 SI 표준 양식</div>
+              <div class="text-xs text-accent-500 font-semibold group-hover:underline">다운로드 →</div>
+            </button>
+            <button onclick="downloadJSON()" class="export-card p-5 rounded-xl border-2 border-gray-200 hover:border-accent-500 hover:bg-accent-500/5 transition text-left group">
+              <div class="text-3xl mb-3">{ }</div>
+              <div class="font-bold mb-1 text-navy-900">JSON</div>
+              <div class="text-xs text-gray-500 mb-3">API 연동 / 자동화</div>
+              <div class="text-xs text-accent-500 font-semibold group-hover:underline">다운로드 →</div>
+            </button>
+            <button onclick="window.print()" class="export-card p-5 rounded-xl border-2 border-gray-200 hover:border-accent-500 hover:bg-accent-500/5 transition text-left group">
+              <div class="text-3xl mb-3">🖨️</div>
+              <div class="font-bold mb-1 text-navy-900">PDF</div>
+              <div class="text-xs text-gray-500 mb-3">인쇄 · 공유용</div>
+              <div class="text-xs text-accent-500 font-semibold group-hover:underline">PDF 저장 →</div>
+            </button>
+            <button onclick="copyToClipboard()" class="export-card p-5 rounded-xl border-2 border-gray-200 hover:border-accent-500 hover:bg-accent-500/5 transition text-left group">
+              <div class="text-3xl mb-3">📋</div>
+              <div class="font-bold mb-1 text-navy-900">Notion 붙여넣기</div>
+              <div class="text-xs text-gray-500 mb-3">서식 유지 복사</div>
+              <div class="text-xs text-accent-500 font-semibold group-hover:underline">클립보드 복사 →</div>
+            </button>
+            <button onclick="shareLink()" class="export-card p-5 rounded-xl border-2 border-gray-200 hover:border-accent-500 hover:bg-accent-500/5 transition text-left group">
+              <div class="text-3xl mb-3">🔗</div>
+              <div class="font-bold mb-1 text-navy-900">공유 링크</div>
+              <div class="text-xs text-gray-500 mb-3">팀원 즉시 공유</div>
+              <div class="text-xs text-accent-500 font-semibold group-hover:underline">링크 생성 →</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab: GitHub -->
+        <div id="tab-github" class="ax-tab-content p-8 hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="text-xl font-bold text-navy-900 mb-2">🐙 GitHub 자동 연동</h3>
+              <p class="text-sm text-gray-600">PRD에서 코드 저장소 + 이슈 + README까지 자동 생성</p>
+            </div>
+            <button id="ghConnectBtn" onclick="connectGitHub()" class="px-5 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-semibold text-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+              GitHub 연결
+            </button>
+          </div>
+
+          <div class="bg-gray-50 rounded-xl p-6 mb-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="text-sm font-semibold text-gray-700">자동 생성될 항목</div>
+              <span id="ghStatus" class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-600">미연결</span>
+            </div>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center gap-3 p-3 bg-white rounded-lg">
+                <div class="w-8 h-8 rounded bg-blue-100 flex items-center justify-center">📁</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900">Repository</div>
+                  <div class="text-xs text-gray-500 font-mono">specwise-fresh-meal-delivery</div>
+                </div>
+                <div class="text-xs text-gray-400">대기 중</div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-white rounded-lg">
+                <div class="w-8 h-8 rounded bg-green-100 flex items-center justify-center">📝</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900">README.md</div>
+                  <div class="text-xs text-gray-500">PRD 개요·범위 자동 작성</div>
+                </div>
+                <div class="text-xs text-gray-400">대기 중</div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-white rounded-lg">
+                <div class="w-8 h-8 rounded bg-yellow-100 flex items-center justify-center">🐛</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900">Issues 자동 생성</div>
+                  <div class="text-xs text-gray-500">F-001 ~ F-008 (8개 이슈, 우선순위 라벨)</div>
+                </div>
+                <div class="text-xs text-gray-400">대기 중</div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-white rounded-lg">
+                <div class="w-8 h-8 rounded bg-purple-100 flex items-center justify-center">📋</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900">Project Board (Kanban)</div>
+                  <div class="text-xs text-gray-500">백로그/진행/완료 칸반 보드</div>
+                </div>
+                <div class="text-xs text-gray-400">대기 중</div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-white rounded-lg">
+                <div class="w-8 h-8 rounded bg-red-100 flex items-center justify-center">⚙️</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900">CI/CD Workflow</div>
+                  <div class="text-xs text-gray-500 font-mono">.github/workflows/deploy.yml</div>
+                </div>
+                <div class="text-xs text-gray-400">대기 중</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-3">
+            <button onclick="autoCreateRepo()" class="px-5 py-3 rounded-xl border border-gray-300 hover:bg-gray-50 font-semibold text-sm">📦 Repo 자동 생성</button>
+            <button onclick="autoCreateIssues()" class="px-5 py-3 rounded-xl border border-gray-300 hover:bg-gray-50 font-semibold text-sm">🐛 Issues 일괄 생성 (8개)</button>
+          </div>
+        </div>
+
+        <!-- Tab: Deploy -->
+        <div id="tab-deploy" class="ax-tab-content p-8 hidden">
+          <h3 class="text-xl font-bold text-navy-900 mb-2">🚀 원클릭 배포</h3>
+          <p class="text-sm text-gray-600 mb-6">코드 저장소가 준비되면 즉시 클라우드에 배포합니다.</p>
+
+          <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <button onclick="deployTo('vercel')" class="p-5 rounded-xl border-2 border-gray-200 hover:border-black hover:bg-gray-50 transition text-left">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg bg-black flex items-center justify-center text-white font-bold">▲</div>
+                <div class="font-bold text-navy-900">Vercel</div>
+              </div>
+              <div class="text-xs text-gray-500 mb-2">Next.js 최적화 · 자동 SSL</div>
+              <div class="text-xs text-accent-500 font-semibold">배포 시작 →</div>
+            </button>
+            <button onclick="deployTo('netlify')" class="p-5 rounded-xl border-2 border-gray-200 hover:border-teal-500 hover:bg-teal-50 transition text-left">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg bg-teal-500 flex items-center justify-center text-white font-bold">N</div>
+                <div class="font-bold text-navy-900">Netlify</div>
+              </div>
+              <div class="text-xs text-gray-500 mb-2">JAMstack · CDN 자동</div>
+              <div class="text-xs text-accent-500 font-semibold">배포 시작 →</div>
+            </button>
+            <button onclick="deployTo('ghpages')" class="p-5 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 transition text-left">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center text-white font-bold">GH</div>
+                <div class="font-bold text-navy-900">GitHub Pages</div>
+              </div>
+              <div class="text-xs text-gray-500 mb-2">정적 사이트 · 무료</div>
+              <div class="text-xs text-accent-500 font-semibold">배포 시작 →</div>
+            </button>
+          </div>
+
+          <div class="bg-gray-50 rounded-xl p-5">
+            <div class="text-sm font-semibold text-gray-700 mb-3">배포 옵션</div>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-accent-500"> 커스텀 도메인 자동 연결</label>
+              <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-accent-500"> SSL 자동 발급 (Let's Encrypt)</label>
+              <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-accent-500"> Preview 배포 (PR마다)</label>
+              <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-accent-500"> 배포 후 슬랙 알림</label>
+              <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-accent-500"> 분석 도구 자동 연동 (GA4)</label>
+              <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-accent-500"> 에러 모니터링 (Sentry)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Collab -->
+        <div id="tab-collab" class="ax-tab-content p-8 hidden">
+          <h3 class="text-xl font-bold text-navy-900 mb-2">🤝 협업 도구 자동 동기화</h3>
+          <p class="text-sm text-gray-600 mb-6">PRD가 바뀌면 모든 곳이 자동 업데이트됩니다.</p>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="p-5 rounded-xl border border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-2xl">💬</div>
+                <div>
+                  <div class="font-bold text-navy-900">Slack</div>
+                  <div class="text-xs text-gray-500">PRD 변경 시 채널 알림</div>
+                </div>
+              </div>
+              <button onclick="connectTool('Slack')" class="px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-400 text-white text-sm font-semibold">연결</button>
+            </div>
+            <div class="p-5 rounded-xl border border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-2xl">🎯</div>
+                <div>
+                  <div class="font-bold text-navy-900">Jira</div>
+                  <div class="text-xs text-gray-500">F-001~F-008 자동 이슈 생성</div>
+                </div>
+              </div>
+              <button onclick="connectTool('Jira')" class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold">연결</button>
+            </div>
+            <div class="p-5 rounded-xl border border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-2xl">📚</div>
+                <div>
+                  <div class="font-bold text-navy-900">Notion</div>
+                  <div class="text-xs text-gray-500">DB 자동 갱신 · 양방향 동기화</div>
+                </div>
+              </div>
+              <button onclick="connectTool('Notion')" class="px-4 py-2 rounded-lg bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold">연결</button>
+            </div>
+            <div class="p-5 rounded-xl border border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center text-2xl">📊</div>
+                <div>
+                  <div class="font-bold text-navy-900">Linear</div>
+                  <div class="text-xs text-gray-500">백로그 자동 동기화</div>
+                </div>
+              </div>
+              <button onclick="connectTool('Linear')" class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-semibold">연결</button>
+            </div>
+            <div class="p-5 rounded-xl border border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center text-2xl">🎨</div>
+                <div>
+                  <div class="font-bold text-navy-900">Figma</div>
+                  <div class="text-xs text-gray-500">화면 목록 자동 프레임 생성</div>
+                </div>
+              </div>
+              <button onclick="connectTool('Figma')" class="px-4 py-2 rounded-lg bg-pink-500 hover:bg-pink-400 text-white text-sm font-semibold">연결</button>
+            </div>
+            <div class="p-5 rounded-xl border border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-2xl">📅</div>
+                <div>
+                  <div class="font-bold text-navy-900">Google Calendar</div>
+                  <div class="text-xs text-gray-500">마일스톤 일정 자동 등록</div>
+                </div>
+              </div>
+              <button onclick="connectTool('Google Calendar')" class="px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-400 text-white text-sm font-semibold">연결</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Agents -->
+        <div id="tab-agents" class="ax-tab-content p-8 hidden">
+          <h3 class="text-xl font-bold text-navy-900 mb-2">🤖 AI 에이전트 (V2 출시 예정)</h3>
+          <p class="text-sm text-gray-600 mb-6">PRD를 학습한 전문 에이전트가 후속 산출물을 자동 생성합니다.</p>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="p-6 rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-blue-50 to-transparent">
+              <div class="flex items-start gap-4 mb-3">
+                <div class="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center text-2xl">🧪</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900 mb-1">QA Agent</div>
+                  <div class="text-xs text-gray-500">F-001~F-008에서 280개 QA 케이스 자동 생성</div>
+                </div>
+              </div>
+              <div class="text-xs text-gray-600 mb-3">정상/예외/경계값/보안 케이스 자동 분기</div>
+              <div class="text-xs text-blue-600 font-semibold">월 99,000원 · V2 출시 예정</div>
+            </div>
+            <div class="p-6 rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-green-50 to-transparent">
+              <div class="flex items-start gap-4 mb-3">
+                <div class="w-14 h-14 rounded-2xl bg-green-500 flex items-center justify-center text-2xl">📖</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900 mb-1">Docs Agent</div>
+                  <div class="text-xs text-gray-500">사용자 매뉴얼 + 운영자 매뉴얼 자동 생성</div>
+                </div>
+              </div>
+              <div class="text-xs text-gray-600 mb-3">스크린샷 자동 캡처 + 캡션 자동 작성</div>
+              <div class="text-xs text-green-600 font-semibold">월 79,000원 · V3 출시 예정</div>
+            </div>
+            <div class="p-6 rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-purple-50 to-transparent">
+              <div class="flex items-start gap-4 mb-3">
+                <div class="w-14 h-14 rounded-2xl bg-purple-500 flex items-center justify-center text-2xl">⚖️</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900 mb-1">Compliance Agent</div>
+                  <div class="text-xs text-gray-500">개인정보처리방침·이용약관 자동 검토</div>
+                </div>
+              </div>
+              <div class="text-xs text-gray-600 mb-3">한국 개인정보보호법·전자상거래법 자동 매칭</div>
+              <div class="text-xs text-purple-600 font-semibold">월 149,000원 · V3 출시 예정</div>
+            </div>
+            <div class="p-6 rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-orange-50 to-transparent">
+              <div class="flex items-start gap-4 mb-3">
+                <div class="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-2xl">📈</div>
+                <div class="flex-1">
+                  <div class="font-bold text-navy-900 mb-1">Analytics Agent</div>
+                  <div class="text-xs text-gray-500">측정 지표 + GA4 이벤트 자동 정의</div>
+                </div>
+              </div>
+              <div class="text-xs text-gray-600 mb-3">Funnel 노드별 핵심 지표(CVR, Drop-off) 자동 추출</div>
+              <div class="text-xs text-orange-600 font-semibold">월 99,000원 · V3 출시 예정</div>
+            </div>
+          </div>
+
+          <button onclick="toast('에이전트 사전 알림 등록 완료. V2 출시 시 30% 할인 쿠폰 제공.', 'success')" class="mt-6 w-full px-6 py-4 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-bold">
+            🔔 전체 에이전트 사전 알림 신청
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom CTA -->
+      <div class="grid md:grid-cols-2 gap-4">
+        <button onclick="goStep(1)" class="px-6 py-4 rounded-xl border border-gray-300 hover:bg-white text-navy-900 font-bold">
+          ↻ 다른 프로젝트로 시작
+        </button>
+        <a href="pitch-deck.html" class="px-6 py-4 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-bold flex items-center justify-center gap-2">
+          📊 사업계획 피치덱 보기 →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .ax-tab { color: #6b7280; border-bottom: 3px solid transparent; }
+    .ax-tab.active { color: #ff6b3d; border-bottom-color: #ff6b3d; background: #fff7f3; }
+    .ax-tab-content { display: none; }
+    .ax-tab-content.active { display: block; }
+  </style>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // ============= STATE =============
+    const state = {
+      project: { name: '신선식품 정기배송 서비스', size: 'M', domain: '이커머스' },
+      funnel: {
+        nodes: [
+          { id: 'sc1', type: 'SC', label: '홈/온보딩' },
+          { id: 'ac1', type: 'AC', label: '회원가입' },
+          { id: 'sc2', type: 'SC', label: '취향 설정' },
+          { id: 'de1', type: 'DE', label: '결제수단 등록?' },
+          { id: 'sc3', type: 'SC', label: '식단 추천' },
+          { id: 'ac2', type: 'AC', label: '자동결제' },
+          { id: 'ex1', type: 'EX', label: '배송 완료' },
+          { id: 'de2', type: 'DE', label: '일시정지?' },
+        ],
+      },
+      features: [
+        { id: 'F-001', name: '홈 화면 + 비로그인 미리보기', source: 'SC: 홈/온보딩', priority: 'Must' },
+        { id: 'F-002', name: '소셜 로그인 (카카오/Apple)', source: 'AC: 회원가입', priority: 'Must' },
+        { id: 'F-003', name: '식단 취향 설정 (5개 항목)', source: 'SC: 취향 설정', priority: 'Must' },
+        { id: 'F-004', name: '결제수단 등록 분기 처리', source: 'DE: 결제수단', priority: 'Must' },
+        { id: 'F-005', name: 'AI 주간 식단 추천', source: 'SC: 식단 추천', priority: 'Must' },
+        { id: 'F-006', name: '정기결제 + 실패 재시도 3회', source: 'AC: 자동결제', priority: 'Must' },
+        { id: 'F-007', name: '일시정지 / 4주 후 자동 알림', source: 'DE: 일시정지', priority: 'Should' },
+        { id: 'F-008', name: '배송 추적 + 완료 알림', source: 'EX: 배송 완료', priority: 'Should' },
+      ],
+      github: { connected: false },
+      curStep: 1,
+    };
+
+    // ============= TOAST SYSTEM =============
+    function toast(msg, type = 'info') {
+      const div = document.createElement('div');
+      const colors = {
+        info: 'bg-navy-900',
+        success: 'bg-green-500',
+        warning: 'bg-yellow-500',
+        error: 'bg-red-500',
+      };
+      div.className = `toast px-5 py-3 rounded-xl shadow-lg text-white text-sm font-semibold ${colors[type] || colors.info} max-w-md`;
+      div.textContent = msg;
+      document.getElementById('toastContainer').appendChild(div);
+      setTimeout(() => {
+        div.style.transition = 'opacity 0.3s';
+        div.style.opacity = '0';
+        setTimeout(() => div.remove(), 300);
+      }, 2800);
+    }
+
+    // ============= STEP NAVIGATION =============
+    function goStep(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.querySelector(`.step[data-step="${n}"]`).classList.add('active');
+      document.querySelectorAll('.step-dot').forEach(d => {
+        const sn = parseInt(d.dataset.step);
+        d.classList.remove('active', 'done');
+        if (sn === n) d.classList.add('active');
+        else if (sn < n) d.classList.add('done');
+      });
+      state.curStep = n;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ============= STEP 1: SIZE & DOMAIN =============
+    function selectSize(size) {
+      state.project.size = size;
+      document.querySelectorAll('.size-card').forEach(c => {
+        const isSelected = c.dataset.size === size;
+        c.className = `size-card p-5 rounded-2xl border-2 text-left transition ${
+          isSelected
+            ? 'bg-accent-500 border-accent-500 text-white'
+            : 'bg-white border-gray-200 hover:border-accent-500'
+        }`;
+        const tag = c.querySelector('.size-tag');
+        const title = c.querySelector('.size-title');
+        const desc = c.querySelector('.size-desc');
+        if (isSelected) {
+          tag.className = 'size-tag text-xs font-semibold opacity-80 mb-1';
+          tag.textContent = `SIZE ${c.dataset.size} · 선택됨`;
+          title.className = 'size-title font-bold mb-1';
+          desc.className = 'size-desc text-sm opacity-90';
+        } else {
+          tag.className = 'size-tag text-xs font-semibold text-gray-500 mb-1';
+          tag.textContent = `SIZE ${c.dataset.size}`;
+          title.className = 'size-title font-bold text-navy-900 mb-1';
+          desc.className = 'size-desc text-sm text-gray-500';
+        }
+      });
+      toast(`SIZE ${size} 선택됨`, 'info');
+    }
+
+    function selectDomain(btn) {
+      document.querySelectorAll('.domain-btn').forEach(b => {
+        b.classList.remove('bg-accent-500', 'text-white');
+        b.classList.add('bg-gray-100', 'text-gray-700');
+        b.removeAttribute('data-selected');
+      });
+      btn.classList.remove('bg-gray-100', 'text-gray-700');
+      btn.classList.add('bg-accent-500', 'text-white');
+      btn.setAttribute('data-selected', 'true');
+      state.project.domain = btn.dataset.domain;
+      toast(`도메인: ${btn.dataset.domain}`, 'info');
+    }
+
+    // ============= STEP 2: FUNNEL BUILDER =============
+    let nodeCounter = 8;
+    let urlSyncEnabled = false;
+    let zoomPct = 53;
+
+    function addNode(type) {
+      nodeCounter++;
+      const labels = { SC: 'Screen', AC: 'Action', DE: 'Decision', EX: 'Exit' };
+      const nc = document.getElementById('nodeCount');
+      if (nc) nc.innerHTML = `총 <span class="text-white font-mono">${nodeCounter}</span>개 노드 / <span class="text-white font-mono">${nodeCounter - 1}</span>개 연결`;
+      toast(`${labels[type]} 노드 추가됨 — 캔버스 빈 곳을 클릭해 배치`, 'success');
+    }
+
+    function selectFunnelNode(title, type, screenId, desc, visitors) {
+      const typeMap = {
+        SC: { name: '화면 (Screen)', label: '화면', sel: 0 },
+        AC: { name: '액션 (Action)', label: '액션', sel: 0 },
+        DE: { name: '분기 (Decision)', label: '분기', sel: 0 },
+        EX: { name: '완료/이탈 (Exit)', label: '완료/이탈', sel: 0 },
+      };
+      const t = typeMap[type];
+      document.getElementById('propBreadcrumb').textContent = t.label;
+      document.getElementById('propTitle').value = title;
+      document.getElementById('propScreenId').value = screenId;
+      document.getElementById('propDesc').value = desc;
+      document.getElementById('propVisitors').textContent = visitors.toLocaleString();
+      // Generate fake node ID
+      const nodeId = 'N_' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      document.getElementById('propNodeId').textContent = nodeId;
+      // Set type dropdown
+      const sel = document.getElementById('propType');
+      const opts = ['EX', 'SC', 'AC', 'DE'];
+      // Find index where type matches
+      const order = { EX: 0, SC: 1, AC: 2, DE: 3 };
+      sel.selectedIndex = order[type] || 0;
+      toast(`${title} 선택됨 · 우측에서 편집`, 'info');
+    }
+
+    function toggleUrlSync(btn) {
+      urlSyncEnabled = !urlSyncEnabled;
+      const dot = document.getElementById('urlSyncDot');
+      if (urlSyncEnabled) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        btn.classList.remove('text-gray-400');
+        btn.classList.add('text-emerald-300');
+        toast('URL 동기화 켜짐 · 편집 시 자동 갱신', 'success');
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-gray-500';
+        btn.classList.add('text-gray-400');
+        btn.classList.remove('text-emerald-300');
+        toast('URL 동기화 꺼짐', 'info');
+      }
+    }
+
+    function copyShareUrl() {
+      const url = `https://specwise.app/funnel/share/${Math.random().toString(36).slice(2, 14)}`;
+      navigator.clipboard.writeText(url).then(() => {
+        toast(`공유 URL 복사됨 · ${url.slice(0, 50)}...`, 'success');
+      }).catch(() => toast(`공유 URL: ${url}`, 'info'));
+    }
+
+    function downloadFunnelJSON() {
+      const data = {
+        name: '신선식품 정기배송 퍼널',
+        version: 3,
+        nodes: state.funnel.nodes.map((n, i) => ({
+          ...n,
+          screenId: ['SC-001','AC-001','SC-002','DE-001','SC-006','AC-002','EX-001','DE-002'][i],
+          visitors: [12500, 9912, 7860, 7860, 5778, 5673, 4799, 1280][i],
+        })),
+        connections: 7,
+        conversionRate: 0.384,
+        meta: { exportedAt: new Date().toISOString(), tool: 'Specwise Funnel Builder' },
+      };
+      downloadFile(JSON.stringify(data, null, 2), 'funnel-fresh-meal.json', 'application/json');
+    }
+
+    function zoomCanvas(action) {
+      if (action === '+') zoomPct = Math.min(200, zoomPct + 10);
+      else if (action === '-') zoomPct = Math.max(20, zoomPct - 10);
+      else if (action === 'fit') zoomPct = 53;
+      const el = document.getElementById('zoomLevel');
+      if (el) el.textContent = `${zoomPct}%`;
+      toast(`줌 ${action === 'fit' ? '전체보기' : zoomPct + '%'}`, 'info');
+    }
+
+    // ============= STEP 3: ANSWER =============
+    function sendAnswer() {
+      const input = document.getElementById('answerInput');
+      const val = input.value.trim();
+      if (!val) {
+        toast('답변을 입력하세요', 'warning');
+        return;
+      }
+      const chat = document.getElementById('chatArea');
+      chat.insertAdjacentHTML('beforeend', `
+        <div class="flex justify-end"><div class="bg-accent-500 text-white rounded-2xl rounded-tr-sm p-3 max-w-md text-sm">${val}</div></div>
+      `);
+      input.value = '';
+      const cur = parseInt(document.getElementById('qProgress').textContent);
+      if (cur < 8) {
+        document.getElementById('qProgress').textContent = cur + 1;
+        setTimeout(() => {
+          chat.insertAdjacentHTML('beforeend', `
+            <div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-accent-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">AI</div><div class="flex-1 bg-gray-50 rounded-2xl rounded-tl-sm p-4"><div class="text-xs text-accent-500 font-semibold mb-1">Q${cur + 1} · 추가 확인</div><div class="text-sm text-gray-800">감사합니다. 다음 질문이 있어요...</div></div></div>
+          `);
+          chat.scrollTop = chat.scrollHeight;
+        }, 800);
+      } else {
+        toast('모든 질문이 완료되었습니다. PRD 생성 중...', 'success');
+        setTimeout(() => goStep(4), 1200);
+      }
+      chat.scrollTop = chat.scrollHeight;
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const inp = document.getElementById('answerInput');
+      if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') sendAnswer(); });
+    });
+
+    // ============= STEP 4: TOC SCROLL =============
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ============= REAL EXPORTS =============
+    function generatePRDMarkdown() {
+      const today = new Date().toISOString().split('T')[0];
+      let md = `# ${state.project.name}\n\n`;
+      md += `> PRD v1.0 · Generated by Specwise · ${today}\n`;
+      md += `> Size: ${state.project.size} · Domain: ${state.project.domain}\n\n`;
+      md += `---\n\n`;
+      md += `## 1. 프로젝트 개요\n\n`;
+      md += `### 1.1 배경 및 목적\n\n`;
+      md += `1인 가구 증가에 따른 식재료 구매·식단 고민의 페인을 해결한다. AI 식단 추천 기반 정기배송으로 사용자의 의사결정 비용을 0에 가깝게 만든다. 사용자는 한 번 취향만 설정하면 매주 자동으로 신선한 식단을 받게 된다.\n\n`;
+      md += `### 1.2 범위 (In Scope)\n\n`;
+      md += `- 회원가입 / 로그인 (카카오, Apple, 이메일 백업)\n`;
+      md += `- 식단 취향 설정 (제외 식재료, 칼로리, 알레르기)\n`;
+      md += `- AI 주간 식단 추천\n`;
+      md += `- 정기결제 (토스페이먼츠 연동)\n`;
+      md += `- 일시정지 / 재개 / 해지\n`;
+      md += `- 새벽배송 추적\n`;
+      md += `- 1주 무료 체험 (비로그인 미리보기 포함)\n\n`;
+      md += `### 1.3 범위 (Out of Scope · v1)\n\n`;
+      md += `- 사용자 간 식단 공유 / 소셜 기능\n`;
+      md += `- 영양사 1:1 상담\n`;
+      md += `- B2B(기업 복지) 결제\n\n`;
+      md += `## 2. 사용자 정의\n\n`;
+      md += `**페르소나 A:** 1인 가구 직장인 (25-35세) — 시간 부족, 건강 관심\n`;
+      md += `**페르소나 B:** 학생/대학원생 — 가격 민감, 가벼운 식단 선호\n\n`;
+      md += `## 3. 기능 요건\n\n`;
+      md += `| ID | 기능 | 출처 노드 | 우선순위 |\n|---|---|---|---|\n`;
+      state.features.forEach(f => {
+        md += `| ${f.id} | ${f.name} | ${f.source} | ${f.priority} |\n`;
+      });
+      md += `\n## 4. 비기능 요건\n\n`;
+      md += `- **성능**: API 응답 P95 < 300ms\n`;
+      md += `- **가용성**: 99.5% 이상\n`;
+      md += `- **보안**: ISMS-P 준수, 결제 PCI-DSS\n`;
+      md += `- **호환성**: iOS 14+, Android 10+, Chrome/Safari 최신 2버전\n\n`;
+      md += `## 5. 화면 목록 (12종)\n\n`;
+      ['홈 (비로그인)', '식단 미리보기', '회원가입 / 로그인', '취향 설정 (5단계)', '결제수단 등록', '주간 식단 추천', '식단 변경/스킵', '결제 내역', '배송 추적', '일시정지 / 재개', '마이페이지', '알림 설정'].forEach((s, i) => {
+        md += `${i+1}. **SC-${String(i+1).padStart(3,'0')}** · ${s}\n`;
+      });
+      md += `\n## 6. 비즈니스 룰\n\n`;
+      md += `- 첫 1주 무료 체험 (결제수단 등록 필수)\n`;
+      md += `- 결제 실패 시 3회 재시도 후 자동 일시정지\n`;
+      md += `- 4주 이상 일시정지 시 사용자에게 알림 + 자동 해지 안내\n`;
+      md += `- 식단 변경은 배송 3일 전까지 가능\n\n`;
+      md += `## 7. 일정·공수 추정\n\n`;
+      md += `| 단계 | 기간 | 투입 인원 |\n|---|---|---|\n`;
+      md += `| 기획·UI 설계 | 2주 | PM 1, 디자이너 1 |\n`;
+      md += `| 프론트엔드 개발 | 3주 | FE 1 |\n`;
+      md += `| 백엔드 + 결제 연동 | 3주 | BE 1 |\n`;
+      md += `| QA + 배포 | 1주 | QA 1 |\n`;
+      md += `| **합계** | **6주** | **4명 동시 투입** |\n\n`;
+      md += `## 8. 가정·리스크\n\n`;
+      md += `**가정**:\n- 토스페이먼츠 정기결제 API 안정 운영\n- 새벽배송 파트너 확보 가능 (마켓컬리/쿠팡 협업)\n\n`;
+      md += `**리스크**:\n- 식단 추천 품질 (AI 모델 정확도 검증 필요)\n- 새벽배송 권역 제한 (수도권 우선)\n- 정기결제 이탈률 관리\n\n`;
+      md += `---\n*Generated by Specwise · 한국 SI/PM AI 코파일럿*\n`;
+      return md;
+    }
+
+    function downloadFile(content, filename, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadMarkdown() {
+      const md = generatePRDMarkdown();
+      downloadFile(md, `PRD-${state.project.name.replace(/\s+/g, '_')}.md`, 'text/markdown;charset=utf-8');
+      toast('Markdown 파일 다운로드 완료', 'success');
+    }
+
+    function downloadJSON() {
+      const data = {
+        project: state.project,
+        funnel: state.funnel,
+        features: state.features,
+        meta: { generatedAt: new Date().toISOString(), tool: 'Specwise', version: '1.0' },
+      };
+      downloadFile(JSON.stringify(data, null, 2), `PRD-${state.project.name.replace(/\s+/g, '_')}.json`, 'application/json');
+      toast('JSON 파일 다운로드 완료', 'success');
+    }
+
+    function downloadDocx() {
+      // Generate HTML that Word can open as .doc
+      const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset='utf-8'><title>${state.project.name}</title></head>
+<body>
+<h1>${state.project.name}</h1>
+<p><i>PRD v1.0 · Generated by Specwise · ${new Date().toISOString().split('T')[0]}</i></p>
+<hr/>
+<h2>1. 프로젝트 개요</h2>
+<p>1인 가구 증가에 따른 식재료 구매·식단 고민의 페인을 해결한다.</p>
+<h2>3. 기능 요건</h2>
+<table border='1' cellpadding='6'><tr><th>ID</th><th>기능</th><th>출처</th><th>우선순위</th></tr>
+${state.features.map(f => `<tr><td>${f.id}</td><td>${f.name}</td><td>${f.source}</td><td>${f.priority}</td></tr>`).join('')}
+</table>
+</body></html>`;
+      downloadFile(html, `PRD-${state.project.name.replace(/\s+/g, '_')}.doc`, 'application/msword');
+      toast('Word 파일 다운로드 완료', 'success');
+    }
+
+    function copyToClipboard() {
+      const md = generatePRDMarkdown();
+      navigator.clipboard.writeText(md).then(() => {
+        toast('Markdown이 클립보드에 복사되었습니다 (Notion에 바로 붙여넣기 가능)', 'success');
+      }).catch(() => toast('복사 실패. 브라우저 권한을 확인하세요.', 'error'));
+    }
+
+    function shareLink() {
+      const url = `https://specwise.app/share/${Math.random().toString(36).slice(2, 10)}`;
+      navigator.clipboard.writeText(url).then(() => {
+        toast(`공유 링크 복사됨: ${url}`, 'success');
+      }).catch(() => toast(`공유 링크: ${url}`, 'info'));
+    }
+
+    // ============= STEP 5: NEXT STEPS =============
+    function openExcalidraw() {
+      toast('화면 12개 정보를 Excalidraw로 전송 중...', 'info');
+      setTimeout(() => {
+        toast('Excalidraw 새 창이 열립니다', 'success');
+        window.open('https://excalidraw.com/', '_blank');
+      }, 800);
+    }
+    function openFigma() {
+      toast('Figma 와이어프레임 템플릿 준비 중...', 'info');
+      setTimeout(() => window.open('https://www.figma.com/community', '_blank'), 800);
+    }
+    function sendToV0() {
+      toast('PRD 컨텍스트를 v0에 전송 중...', 'info');
+      setTimeout(() => window.open('https://v0.dev/', '_blank'), 800);
+    }
+    function sendToBolt() {
+      toast('Bolt.new 프로젝트 생성 중...', 'info');
+      setTimeout(() => window.open('https://bolt.new/', '_blank'), 800);
+    }
+
+    // ============= STEP 6: AX STUDIO =============
+    function switchTab(tab) {
+      document.querySelectorAll('.ax-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.ax-tab-content').forEach(c => { c.classList.remove('active'); c.classList.add('hidden'); });
+      document.querySelector(`.ax-tab[data-tab="${tab}"]`).classList.add('active');
+      const content = document.getElementById(`tab-${tab}`);
+      content.classList.add('active');
+      content.classList.remove('hidden');
+    }
+
+    function connectGitHub() {
+      const btn = document.getElementById('ghConnectBtn');
+      const status = document.getElementById('ghStatus');
+      btn.innerHTML = '<svg class="w-4 h-4 spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="3" stroke-dasharray="40 60"/></svg> 연결 중...';
+      setTimeout(() => {
+        state.github.connected = true;
+        btn.innerHTML = '✓ GitHub 연결됨';
+        btn.className = 'px-5 py-2.5 rounded-xl bg-green-500 text-white font-semibold text-sm flex items-center gap-2';
+        status.textContent = '연결됨';
+        status.className = 'text-xs px-2 py-1 rounded-full bg-green-100 text-green-700';
+        toast('GitHub OAuth 인증 완료 (clooney0402)', 'success');
+      }, 1500);
+    }
+
+    function autoCreateRepo() {
+      if (!state.github.connected) {
+        toast('먼저 GitHub를 연결하세요', 'warning');
+        return;
+      }
+      toast('Repository 생성 중: specwise-fresh-meal-delivery', 'info');
+      setTimeout(() => toast('✓ Repo 생성 완료. README.md 작성 중...', 'success'), 1000);
+      setTimeout(() => toast('✓ README.md 자동 생성 완료', 'success'), 2000);
+      setTimeout(() => toast('✓ .github/workflows/deploy.yml 생성 완료', 'success'), 2800);
+    }
+
+    function autoCreateIssues() {
+      if (!state.github.connected) {
+        toast('먼저 GitHub를 연결하세요', 'warning');
+        return;
+      }
+      toast('8개 Issue 자동 생성 중...', 'info');
+      state.features.forEach((f, i) => {
+        setTimeout(() => toast(`✓ Issue #${i+1} 생성: ${f.id} ${f.name}`, 'success'), 600 + i * 350);
+      });
+    }
+
+    function deployTo(platform) {
+      const names = { vercel: 'Vercel', netlify: 'Netlify', ghpages: 'GitHub Pages' };
+      toast(`${names[platform]}에 배포 시작...`, 'info');
+      setTimeout(() => toast(`✓ 빌드 완료 (32초)`, 'success'), 1500);
+      setTimeout(() => toast(`🚀 배포 완료: https://specwise-fresh-meal.${platform === 'ghpages' ? 'github.io' : platform + '.app'}`, 'success'), 2800);
+    }
+
+    function connectTool(name) {
+      toast(`${name} OAuth 인증 페이지로 이동...`, 'info');
+      setTimeout(() => toast(`✓ ${name} 연결 완료. 자동 동기화 시작.`, 'success'), 1200);
+    }
+
+    function runFullPipeline() {
+      const btnText = document.getElementById('pipelineBtnText');
+      const stages = document.querySelectorAll('.pipeline-step');
+      const messages = [
+        '1/5 PRD 데이터 수집 중...',
+        '2/5 Markdown 변환 중...',
+        '3/5 GitHub Repo 생성 + Issues 자동화 중...',
+        '4/5 Vercel 자동 배포 중...',
+        '5/5 모니터링 도구 연결 중...',
+      ];
+
+      btnText.innerHTML = '<svg class="w-4 h-4 spin inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="3" stroke-dasharray="40 60"/></svg>실행 중...';
+
+      messages.forEach((msg, i) => {
+        setTimeout(() => {
+          toast(msg, 'info');
+          if (stages[i]) {
+            stages[i].querySelector('.text-\\[10px\\]').textContent = '✓ 완료';
+            stages[i].querySelector('.bg-white\\/10').classList.add('bg-accent-500');
+            stages[i].querySelector('.bg-white\\/10').classList.remove('bg-white/10');
+          }
+        }, i * 1200);
+      });
+
+      setTimeout(() => {
+        btnText.textContent = '✓ 파이프라인 완료';
+        toast('🎉 전체 자동화 완료. 5분 만에 PRD → 배포까지.', 'success');
+      }, messages.length * 1200);
+    }
+
+    // ============= INIT =============
+    goStep(1);
+  </script>
+</body>
+</html>
